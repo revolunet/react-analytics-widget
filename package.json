@@ -1,0 +1,46 @@
+{
+  "name": "react-analytics-widget",
+  "version": "1.0.0",
+  "description": "Embed Google Analytics widgets in your React applications",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/revolunet/react-analytics-widget.git"
+  },
+  "homepage": "https://revolunet.github.io/react-analytics-widget/",
+  "bugs": {
+    "url": "https://github.com/revolunet/react-analytics-widget/issues"
+  },
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-react-component",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "start": "nwb serve-react-demo",
+    "test": "nwb test-react",
+    "publish": "gh-pages demo/dist && git push",
+    "test:coverage": "nwb test-react --coverage",
+    "test:watch": "nwb test-react --server"
+  },
+  "peerDependencies": {
+    "react": "15.x"
+  },
+  "devDependencies": {
+    "nwb": "0.18.x",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "gh-pages": "^1.0.0"
+  },
+  "author": "Julien Bouquillon <julien@bouquillon.com>",
+  "license": "MIT",
+  "keywords": [
+    "react-component",
+    "analytics",
+    "widget"
+  ]
+}
