@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { render } from "react-dom"
+import GithubCorner from 'react-github-corner';
 
 import { GoogleProvider, GoogleDataChart } from "../../src"
 
@@ -102,6 +103,7 @@ class Example extends React.Component {
     }
     return (
       <div>
+        <GithubCorner href="https://github.com/revolunet/react-analytics-widget" />
         <GoogleProvider clientId={CLIENT_ID}>
           <div style={{margin:'20px 0'}}>
             Define your view ID :
