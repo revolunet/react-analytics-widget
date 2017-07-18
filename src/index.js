@@ -1,6 +1,9 @@
 import React from 'react';
 import { render } from 'react-dom';
 
+// dont wait for auth twice, even after unmounts
+let isLoaded = false;
+
 // wait for auth to display children
 export class GoogleProvider extends React.Component {
   state = {
@@ -18,6 +21,12 @@ export class GoogleProvider extends React.Component {
         });
     };
     gapi.analytics.ready(a => {
+      if (isLoaded) {
+        this.setState({
+          ready: true,
+        });
+        return;
+      }
       gapi.analytics.auth.on('success', response => {
         this.setState({
           ready: true,
