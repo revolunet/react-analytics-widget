@@ -1,6 +1,6 @@
 {
   "name": "react-analytics-widget",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Embed Google Analytics widgets in your React applications",
   "main": "lib/index.js",
   "module": "es/index.js",
