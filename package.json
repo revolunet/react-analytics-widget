@@ -23,7 +23,7 @@
     "clean": "nwb clean-module && nwb clean-demo",
     "start": "nwb serve-react-demo",
     "test": "nwb test-react",
-    "publish": "gh-pages -d demo/dist && git push && npm publish",
+    "publish": "gh-pages -d demo/dist && git push",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server"
   },
