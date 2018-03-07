@@ -1,5 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
+import PropTypes from 'prop-types';
 
 // dont wait for auth twice, even after unmounts
 let isLoaded = false;
@@ -14,9 +15,12 @@ export class GoogleProvider extends React.Component {
   }
   init = () => {
     const doAuth = () => {
+      const authObj = this.props.serverAuth ?
+        {serverAuth: {access_token: this.props.accessToken}} :
+        {clientid: this.props.clientId};
       gapi.analytics.auth &&
         gapi.analytics.auth.authorize({
-          clientid: this.props.clientId,
+          ...authObj,
           container: this.authButtonNode
         });
     };
@@ -45,11 +49,20 @@ export class GoogleProvider extends React.Component {
   render() {
     return (
       <div>
-        <div ref={node => (this.authButtonNode = node)} />
+        {!this.props.serverAuth && <div ref={node => (this.authButtonNode = node)} />}
         {this.state.ready && this.props.children}
       </div>
     );
   }
+}
+GoogleProvider.propTypes = {
+  clientId: PropTypes.string,
+  serverAuth: PropTypes.bool,
+  accessToken: PropTypes.string,
+}
+
+GoogleProvider.defaultProps = {
+  serverAuth: false,
 }
 
 // single chart
