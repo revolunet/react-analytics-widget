@@ -16,6 +16,9 @@ Demo : [https://revolunet.github.io/react-analytics-widget](https://revolunet.gi
 You need to create a OAUTH client id in the [google developer console](https://console.developers.google.com/apis/credentials/oauthclient/960315238073-dv345fcj3tkikn506k9lrch73hk9259u.apps.googleusercontent.com?project=eastern-store-174123) and provide an [analytic view ID](https://ga-dev-tools.appspot.com/query-explorer/).
 Alternatively you can use server-side authentication tokens. You can find more info in this [example](https://ga-dev-tools.appspot.com/embed-api/server-side-authorization/).
 
+### Note:
+If you provide values for both the `accessToken` and the `clientId` props, the latter will be ignored.
+
 Also, add the Google SDK at the top of your page
 
 ```js
@@ -98,9 +101,8 @@ const Example = () => (
 
 ```js
 
+import React, { Component } from 'react';
 import { GoogleProvider, GoogleDataChart } from 'react-analytics-widget'
-
-const ACCESS_TOKEN = 'YZemeTl-Hj.k4imTg92D_GxmFNhnYwPdl-F2OO_49t2p7PZ3E00pE94g5_V-VMraNmn4wzKlv2AOB4KE0gfP3arK3WN9c8lJcr.oQy1BhAXJr-IqHsenqpqUo0PAt3OrJ';
 
 // graph 1 config
 const last30days = {
@@ -142,12 +144,25 @@ const views = {
   }
 }
 
-const Example = () => (
-  <GoogleProvider serverAuth accessToken={ACCESS_TOKEN}>
-    <GoogleDataChart views={views} config={last30days} />
-    <GoogleDataChart views={views} config={last7days} />
-  </GoogleProvider>
-)
+class Example extends Component {
+  componentDidMount = () => {
+    const request = new Request('https://yourserver.example/auth/ganalytics/getToken', {
+      method: 'GET'
+    });
+    fetch(request)
+      .then(response => response.json())
+      .then(({ token }) => {
+        this.setState({ token }); // TODO: handle errors
+      });
+  }
+
+  render = () => (
+    <GoogleProvider accessToken={this.state.token}>
+      <GoogleDataChart views={views} config={last30days} />
+      <GoogleDataChart views={views} config={last7days} />
+    </GoogleProvider>
+  )
+}
 ```
 
 [npm-badge]: https://img.shields.io/npm/v/react-analytics-widget.png?style=flat-square
