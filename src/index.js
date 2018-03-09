@@ -15,7 +15,7 @@ export class GoogleProvider extends React.Component {
   }
   init = () => {
     const doAuth = () => {
-      const authObj = this.props.serverAuth ?
+      const authObj = this.props.accessToken ?
         {serverAuth: {access_token: this.props.accessToken}} :
         {clientid: this.props.clientId};
       gapi.analytics.auth &&
@@ -49,7 +49,7 @@ export class GoogleProvider extends React.Component {
   render() {
     return (
       <div>
-        {!this.props.serverAuth && <div ref={node => (this.authButtonNode = node)} />}
+        {this.props.clientId && <div ref={node => (this.authButtonNode = node)} />}
         {this.state.ready && this.props.children}
       </div>
     );
@@ -57,12 +57,7 @@ export class GoogleProvider extends React.Component {
 }
 GoogleProvider.propTypes = {
   clientId: PropTypes.string,
-  serverAuth: PropTypes.bool,
   accessToken: PropTypes.string,
-}
-
-GoogleProvider.defaultProps = {
-  serverAuth: false,
 }
 
 // single chart
