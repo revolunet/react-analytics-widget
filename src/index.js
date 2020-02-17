@@ -89,7 +89,7 @@ export class GoogleDataChart extends React.Component {
         style={this.props.style}
         ref={node => (this.chartNode = node)}
       >
-        {this.chart ? null : 'Loading ...' }
+        {this.props.loader ? 'Loading ...' : null}
       </div>
     );
   }
