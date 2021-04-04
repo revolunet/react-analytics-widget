@@ -88,7 +88,9 @@ export class GoogleDataChart extends React.Component {
         className={this.props.className}
         style={this.props.style}
         ref={node => (this.chartNode = node)}
-      />
+      >
+        {!this.chart && this.props.loader !== undefined ? this.props.loader : 'Loading ...'}
+      </div>
     );
   }
 }
