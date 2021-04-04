@@ -32,9 +32,9 @@
   },
   "devDependencies": {
     "gh-pages": "^1.0.0",
-    "nwb": "0.18.x",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "nwb": "^0.25.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-github-corner": "^0.3.0"
   },
   "author": "Julien Bouquillon <julien@bouquillon.com>",
