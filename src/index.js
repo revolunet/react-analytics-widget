@@ -1,5 +1,4 @@
 import React from "react";
-import { render } from "react-dom";
 import PropTypes from 'prop-types';
 
 // dont wait for auth twice, even after unmounts
@@ -58,6 +57,62 @@ export class GoogleProvider extends React.Component {
 GoogleProvider.propTypes = {
   clientId: PropTypes.string,
   accessToken: PropTypes.string,
+}
+
+// real time data for active users
+export class GoogleDataLive extends React.Component {
+  componentDidMount() {
+    const checkExist = setInterval(() => {
+      // Wait until this component is loaded
+      if (typeof gapi.analytics.ext !== undefined) {
+        clearInterval(checkExist);
+        this.loadData();
+      }
+    }, 100)
+  }
+  componentWillUpdate() {
+    this.loadData();
+  }
+  componentWillUnmount() {
+  }
+  loadData = () => {
+    const config = {
+      ...this.props.config,
+      container: this.dataNode
+    };
+    this.activeUsers = new gapi.analytics.ext.ActiveUsers(config);
+    this.activeUsers.set(this.props.views).execute();
+    
+    /**
+     * Add CSS animation to visually show the when users come and go.
+     */
+    this.activeUsers.once('success', () => {
+      const element = this.dataNode.firstChild;
+      let timeout;
+
+      this.activeUsers.on('change', (data) => {
+        const animationClass = data.delta > 0 ? 'is-increasing' : 'is-decreasing';
+        element.className += (' ' + animationClass);
+
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          element.className =
+            element.className.replace(/ is-(increasing|decreasing)/g, '');
+        }, 3000);
+      });
+    });
+  };
+  render() {
+    return (
+      <div
+        className={this.props.className}
+        style={this.props.style}
+        ref={node => (this.dataNode = node)}
+      >
+        {!this.dataNode && this.props.loader !== undefined ? this.props.loader : 'Loading ...'}
+      </div>
+    );
+  }
 }
 
 // single chart

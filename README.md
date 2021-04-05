@@ -6,6 +6,8 @@ Embed Google Analytics widgets in your React applications.
 
  - The `GoogleProvider` container ensure user is logged on analytics
  - The `GoogleDataChart` component display any [DataChart configuraton](https://developers.google.com/analytics/devguides/reporting/embed/v1/component-reference#datachart)
+ - The `GoogleDataLive` component display the [Active Users](https://developers.google.com/analytics/devguides/reporting/realtime/dimsmets/user#rt:activeUsers) in Real Time
+
 
 ![](./demo.png)
 
@@ -40,12 +42,21 @@ Also, add the Google SDK at the top of your page
 })(window, document, "script")
 ```
 
+Additionally add this if you want to use the GoogleDataLive component
+```html
+<!-- Include the ActiveUsers component script. -->
+<script src="https://ga-dev-tools.appspot.com/public/javascript/embed-api/components/active-users.js"></script>
+
+<!-- Include the CSS that styles the charts. -->
+<link rel="stylesheet" href="https://ga-dev-tools.appspot.com/public/css/chartjs-visualizations.css">
+```
+
 ## Usage
 ### OAUTH authentication
 
 ```js
 
-import { GoogleProvider, GoogleDataChart } from 'react-analytics-widget'
+import { GoogleProvider, GoogleDataChart, GoogleDataLive } from 'react-analytics-widget'
 
 const CLIENT_ID = 'x-x--x---x---x-xx--x-apps.googleusercontent.com';
 
@@ -82,6 +93,16 @@ const last7days = {
   }
 }
 
+const activeUsers = {
+  ids: "ga:87986986",
+  reportType: "realtime",
+  pollingInterval: 5, // 5 seconds minimum
+  template: '<div class="ActiveUsers">Active Users: <b class="ActiveUsers-value"></b></div>',
+  query: {
+    metrics: 'rt:activeUsers'
+  }
+}
+
 // analytics views ID
 const views = {
   query: {
@@ -93,6 +114,7 @@ const Example = () => (
   <GoogleProvider clientId={CLIENT_ID}>
     <GoogleDataChart views={views} config={last30days} />
     <GoogleDataChart views={views} config={last7days} />
+    <GoogleDataLive views={views} config={activeUsers} />
   </GoogleProvider>
 )
 ```
