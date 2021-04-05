@@ -80,7 +80,7 @@ export class GoogleDataLive extends React.Component {
       ...this.props.config,
       container: this.dataNode
     };
-    this.activeUsers = new gapi.analytics.ext.ActiveUsers(config);
+    this.activeUsers = new gapi.analytics.ext.ActiveUsers(config);  
     this.activeUsers.set(this.props.views).execute();
     
     /**

@@ -94,9 +94,7 @@ const CHARTS = [
 ]
 
 const ACTIVE_USERS = {
-  reportType: "ga",
   ids: "ga:210653791",
-  reportType: "realtime",
   pollingInterval: 5,
   template: '<div class="ActiveUsers">Usuarios activos: <b class="ActiveUsers-value"></b></div>',
   query: {
