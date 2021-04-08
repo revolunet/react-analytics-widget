@@ -94,7 +94,6 @@ const last7days = {
 }
 
 const activeUsers = {
-  ids: "ga:87986986",
   reportType: "realtime",
   pollingInterval: 5, // 5 seconds minimum
   template: '<div class="ActiveUsers">Active Users: <b class="ActiveUsers-value"></b></div>',

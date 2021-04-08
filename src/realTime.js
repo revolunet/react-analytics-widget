@@ -1,16 +1,3 @@
-import React from "react"
-import { render } from "react-dom"
-import GithubCorner from 'react-github-corner';
-
-import { GoogleProvider, GoogleDataChart, GoogleDataLive } from "../../src"
-
-  ; (function (w, d, s, g, js, fs) {
-    g = w.gapi || (w.gapi = {}); g.analytics = { q: [], ready: function (f) { this.q.push(f); } };
-    js = d.createElement(s); fs = d.getElementsByTagName(s)[0];
-    js.src = 'https://apis.google.com/js/platform.js';
-    fs.parentNode.insertBefore(js, fs); js.onload = function () { g.load('analytics'); };
-  }(window, document, 'script'));
-
 // Copyright 2015 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -102,15 +89,13 @@ gapi.analytics.ready(function () {
             if (result.totalResults) {
 
               for (const row of result.rows) {
-
                 table += "<tr>";
                 for (const cell of row) {
-
                   table += "<td>" + cell + "</td>";
                 }
-
                 table += "</tr>";
               }
+              
             } else {
 
               // Default empty value
@@ -188,140 +173,3 @@ gapi.analytics.ready(function () {
 
   });
 });
-
-const CHARTS = [
-  {
-    reportType: "ga",
-    query: {
-      dimensions: "ga:date",
-      metrics: "ga:sessions",
-      "start-date": "10daysAgo",
-      "end-date": "yesterday"
-    },
-    chart: {
-      type: "LINE",
-      options: {
-        title: "Last 10 days sessions",
-        width: '100%'
-      }
-    }
-  },
-  {
-    reportType: "ga",
-    query: {
-      dimensions: "ga:date",
-      metrics: "ga:sessions",
-      "start-date": "30daysAgo",
-      "end-date": "yesterday"
-    },
-    chart: {
-      type: "LINE",
-      options: {
-        title: "Last 30 days sessions",
-        width: '100%'
-      }
-    }
-  },
-  {
-    reportType: "ga",
-    query: {
-      dimensions: "ga:date",
-      metrics: "ga:pageviews",
-      "start-date": "30daysAgo",
-      "end-date": "yesterday"
-    },
-    chart: {
-      type: "LINE",
-      options: {
-        title: "Last 30 days pageviews",
-        width: '100%'
-      }
-    }
-  },
-  {
-    reportType: "ga",
-    query: {
-      dimensions: "ga:date",
-      metrics: "ga:goalCompletionsAll",
-      "start-date": "30daysAgo",
-      "end-date": "yesterday"
-    },
-    chart: {
-      type: "LINE",
-      options: {
-        title: "Last 30 days conversions",
-        width: '100%'
-      }
-    }
-  }
-]
-
-const REAL_TIME = [
-  {
-    pollingInterval: 55,
-    options: {
-      title: "Realtime browsers"
-    },
-    query: {
-      metrics: 'rt:activeUsers',
-      dimensions: 'rt:browser'
-    }
-  },
-  {
-    pollingInterval: 55,
-    options: {
-      title: "Realtime users"
-    },
-    query: {
-      metrics: 'rt:activeUsers'
-    }
-  }
-]
-
-class Example extends React.Component {
-  state = {
-    ids: "ga:210653791" // 240796016
-  }
-
-  componentDidMount = () => {
-    const request = new Request('http://localhost/api/google_auth', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    fetch(request)
-      .then(response => response.json())
-      .then(({ token }) => {
-        this.setState({ token }); // TODO: handle errors
-      });
-  }
-
-  render() {
-    const views = {
-      query: {
-        ids: this.state.ids
-      }
-    }
-    return (
-      <div>
-        <GithubCorner href="https://github.com/revolunet/react-analytics-widget" />
-        <GoogleProvider accessToken={this.state.token}>
-          <div style={{ margin: '20px 0' }}>
-            Define your view ID :
-            <input type="text" onChange={e => this.setState({ ids: e.target.value })} value={this.state.ids} />
-            <button onClick={() => this.forceUpdate()}>Load</button>
-            <br />
-          </div>
-          <div>
-            {CHARTS.map((c, i) => <GoogleDataChart style={{ display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} />)}
-          </div>
-          <div>
-            <GoogleDataLive style={{ verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[0]} />
-            <GoogleDataLive style={{ backgroundColor: '#058dc7', color: '#fff', verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[1]} />
-          </div>
-        </GoogleProvider>
-      </div>
-    )
-  }
-}
-
-render(<Example />, document.getElementById("demo"))
