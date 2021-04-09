@@ -5,8 +5,8 @@
 Embed Google Analytics widgets in your React applications.
 
  - The `GoogleProvider` container ensure user is logged on analytics
- - The `GoogleDataChart` component display any [DataChart configuraton](https://developers.google.com/analytics/devguides/reporting/embed/v1/component-reference#datachart)
- - The `GoogleDataLive` component display the [Active Users](https://developers.google.com/analytics/devguides/reporting/realtime/dimsmets/user#rt:activeUsers) in Real Time
+ - The `GoogleDataChart` component display any [DataChart configuration](https://developers.google.com/analytics/devguides/reporting/embed/v1/component-reference#datachart)
+ - The `GoogleDataRT` component display any [RealTime](https://developers.google.com/analytics/devguides/reporting/realtime/dimsmets/) data
 
 
 ![](./demo.png)
@@ -42,21 +42,62 @@ Also, add the Google SDK at the top of your page
 })(window, document, "script")
 ```
 
-Additionally add this if you want to use the GoogleDataLive component
-```html
-<!-- Include the ActiveUsers component script. -->
-<script src="https://ga-dev-tools.appspot.com/public/javascript/embed-api/components/active-users.js"></script>
+## Usage
+### Customizable props
+You can pass custom props to customize the visualizations.
+```js
+// CUSTOM LOADER
+// By default a css spinner is used
+const loader = '<span>Loading...</span>';
+// ...
+<GoogleDataChart loader={loader} ... />
+<GoogleDataRT loader={loader} ... />
+// ...
 
-<!-- Include the CSS that styles the charts. -->
-<link rel="stylesheet" href="https://ga-dev-tools.appspot.com/public/css/chartjs-visualizations.css">
+// ERRORS
+// By default the errors are hidden (quota, bad view id, insufficient permissions, missing or wrong parameters, etc)
+)
+<GoogleDataRT errors={true} ... />
+
+// CUSTOMIZABLE OUTPUT in GoogleDataRT
+/**
+ * RealTime data is not supported by the official DataChart api,
+ * so we have to make custom visualizations. These values
+ * can be returned as an unique number (a total count)
+ * or as multiples columns (dimensions) that can been displayed as tables or charts.
+ * By default the data is displayed as a number or a table in each case,
+ * but you can customize the api response visualization passing this prop.
+ * 
+ * @param {object} realTimeData Google Api response
+ * @param {array}  realTimeData.columnHeaders Name of the columns returned
+ * @param {string} realTimeData.ids
+ * @param {string} realTimeData.kind
+ * @param {object} realTimeData.profileInfo
+ * @param {string} realTimeData.query
+ * @param {array}  [realTimeData.rows] Rows if there is results
+ * @param {string} realTimeData.selfLink
+ * @param {number} realTimeData.totalResults Total count
+ * @param {object} realTimeData.totalsForAllResults
+ * @returns {component}
+ */
+ const customOutput = (realTimeData) => { 
+  return (
+    <div className="my-custom-visualization">
+    ...
+    </div>
+  ) 
+};
+// ...
+<GoogleDataRT customOutput={customOutput} ... />
+// ...
+
 ```
 
-## Usage
 ### OAUTH authentication
 
 ```js
 
-import { GoogleProvider, GoogleDataChart, GoogleDataLive } from 'react-analytics-widget'
+import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget';
 
 const CLIENT_ID = 'x-x--x---x---x-xx--x-apps.googleusercontent.com';
 
@@ -93,12 +134,26 @@ const last7days = {
   }
 }
 
+// graph 3 realtime users
 const activeUsers = {
-  reportType: "realtime",
   pollingInterval: 5, // 5 seconds minimum
-  template: '<div class="ActiveUsers">Active Users: <b class="ActiveUsers-value"></b></div>',
+  options: {
+    title: 'Realtime users'
+  },
   query: {
     metrics: 'rt:activeUsers'
+  }
+}
+
+// graph 4 realtime active browsers
+const activeBrowsers = {
+  pollingInterval: 5, // 5 seconds minimum
+  options: {
+    title: 'Realtime browsers'
+  },
+  query: {
+    metrics: 'rt:activeUsers',
+    dimensions: 'rt:browser'
   }
 }
 
@@ -113,7 +168,8 @@ const Example = () => (
   <GoogleProvider clientId={CLIENT_ID}>
     <GoogleDataChart views={views} config={last30days} />
     <GoogleDataChart views={views} config={last7days} />
-    <GoogleDataLive views={views} config={activeUsers} />
+    <GoogleDataRT views={views} config={activeUsers} />
+    <GoogleDataRT views={views} config={activeBrowsers} />
   </GoogleProvider>
 )
 ```
@@ -158,20 +214,34 @@ const last7days = {
   }
 }
 
+
+// graph 3 realtime users
+const activeUsers = {
+  pollingInterval: 5, // 5 seconds minimum
+  options: {
+    title: 'Realtime users'
+  },
+  query: {
+    metrics: 'rt:activeUsers'
+  }
+}
+
+// graph 4 realtime active browsers
+const activeBrowsers = {
+  pollingInterval: 5, // 5 seconds minimum
+  options: {
+    title: 'Realtime browsers'
+  },
+  query: {
+    metrics: 'rt:activeUsers',
+    dimensions: 'rt:browser'
+  }
+}
+
 // analytics views ID
 const views = {
   query: {
     ids: "ga:87986986"
-  }
-}
-
-const activeUsers = {
-  ids: "ga:87986986",
-  reportType: "realtime",
-  pollingInterval: 5, // 5 seconds minimum
-  template: '<div class="ActiveUsers">Active Users: <b class="ActiveUsers-value"></b></div>',
-  query: {
-    metrics: 'rt:activeUsers'
   }
 }
 
@@ -192,6 +262,7 @@ class Example extends Component {
       <GoogleDataChart views={views} config={last30days} />
       <GoogleDataChart views={views} config={last7days} />
       <GoogleDataLive views={views} config={activeUsers} />
+      <GoogleDataRT views={views} config={activeBrowsers} />
     </GoogleProvider>
   )
 }
