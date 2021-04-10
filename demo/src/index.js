@@ -13,7 +13,6 @@ import { GoogleProvider, GoogleDataChart, GoogleDataRT } from "../../src"
 
 const CHARTS = [
   {
-    reportType: "ga",
     query: {
       dimensions: "ga:date",
       metrics: "ga:sessions",
@@ -29,7 +28,6 @@ const CHARTS = [
     }
   },
   {
-    reportType: "ga",
     query: {
       dimensions: "ga:date",
       metrics: "ga:sessions",
@@ -45,7 +43,6 @@ const CHARTS = [
     }
   },
   {
-    reportType: "ga",
     query: {
       dimensions: "ga:date",
       metrics: "ga:pageviews",
@@ -61,7 +58,6 @@ const CHARTS = [
     }
   },
   {
-    reportType: "ga",
     query: {
       metrics: 'ga:sessions',
       dimensions: 'ga:browser'
@@ -78,7 +74,7 @@ const CHARTS = [
 
 const REAL_TIME = [
   {
-    pollingInterval: 1000,
+    pollingInterval: 10,
     options: {
       title: "Realtime browsers"
     },
@@ -88,9 +84,9 @@ const REAL_TIME = [
     }
   },
   {
-    pollingInterval: 1000,
+    pollingInterval: 10,
     options: {
-      title: "Realtime users"
+      title: "Active users"
     },
     query: {
       metrics: 'rt:activeUsers'
@@ -113,7 +109,10 @@ class Example extends React.Component {
       .then(response => response.json())
       .then(({ token }) => {
         this.setState({ token }); // TODO: handle errors
-      });
+      })
+      .catch( err => {
+        console.error(err)
+      })
   }
 
   render() {
@@ -133,7 +132,7 @@ class Example extends React.Component {
             <br />
           </div>
           <div>
-            {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true}/>)}
+            {/* {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true}/>)} */}
           </div>
           <div>
             <GoogleDataRT style={{ verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[0]} errors={true}/>

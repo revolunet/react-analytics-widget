@@ -30,13 +30,15 @@ export class GoogleProvider extends React.Component {
     const realTimeController = () => {
 
       /**
-       * This function is an adaptation from one by Google.
-       * 
-       * It's simplified, now has support for other metrics besides ActiveUsers, 
-       * supports dimensions and has error handling (previously non-existent).
-       * 
-       * The original file is:
+       * This code is an adaptation from one made by Google, available here:
        * https://ga-dev-tools.appspot.com/public/javascript/embed-api/components/active-users.js"
+       * 
+       * This version has:
+       * - dynamic support for metrics (not just "rt:activeUsers") than can be passed as an argument
+       * - support for dimensions 
+       * - error handling (previously non-existent) performed according to the official documentation,
+       * with an exponential backoff before retry subsequent requests.
+       * 
        */
       gapi.analytics.createComponent('RealTime', {
 
@@ -49,6 +51,7 @@ export class GoogleProvider extends React.Component {
           // Stop any polling currently going on.
           if (this.polling_) {
             this.stop();
+            this.forcePause_ = false;
           }
           // Wait until the user is authorized.
           if (gapi.analytics.auth.isAuthorized()) {
@@ -58,15 +61,23 @@ export class GoogleProvider extends React.Component {
           }
         },
 
-        stop: function () {
+        stop: function (silent = false) {
           clearTimeout(this.timeout_);
           this.polling_ = false;
-          this.emit('stop', { realTime: this.realTime });
+          if (!silent) {
+            this.emit('stop', { realTime: this.realTime });
+          }
         },
+        pause: function () {
+          console.log('poauseee')
+          this.forcePause_ = true;
+        },
+        pollrealTime_: async function () {
 
-        pollrealTime_: function () {
           const options = this.get();
           const pollingInterval = (options.pollingInterval || 5) * 1000;
+
+          const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
           if (isNaN(pollingInterval) || pollingInterval < 5000) {
             throw new Error('Frequency must be 5 seconds or more.');
@@ -74,23 +85,118 @@ export class GoogleProvider extends React.Component {
 
           this.polling_ = true;
 
-          gapi.client.analytics.data.realtime
-            .get({ ids: options.ids, metrics: options.query.metrics, dimensions: options.query.dimensions })
+          // https://developers.google.com/analytics/devguides/reporting/realtime/v3/errors#error_table
+          // List of errors that are retry-able waiting exponentially
+          const retryExpErrors = [
+            'userRateLimitExceeded',
+            'rateLimitExceeded',
+            'quotaExceeded'
+          ]
 
-            .then(function (response) {
+          // List of errors that are retry-able only once
+          const retryOnceErrors = [
+            'internalServerError',
+            'backendError'
+          ]
 
-              this.realTime = response.result;
-              this.emit('success', { realTime: this.realTime });
+          let errorBody;
+          this.retryOnce_ = null;
 
-              if (this.polling_ == true) {
-                this.timeout_ = setTimeout(this.pollrealTime_.bind(this),
-                  pollingInterval);
+          // If any error occurs in the makeRequest_ method,
+          // the request is retried using an exponential backoff.
+          // https://developers.google.com/analytics/devguides/reporting/realtime/v3/errors#backoff
+          for (let i = 0; i < 5; i++) {
+
+            try {
+
+              const result = await this.makeRequest_(options, pollingInterval);
+
+              if (result) {
+                this.realTime = result;
+                this.forcePause_ = false;
+                this.onSuccess_({ realTime: this.realTime });
+                return;
               }
-            }.bind(this)).catch(function (e) {
-              this.emit('error', JSON.parse(e.body));
-              this.stop();
-            }.bind(this));
 
+            } catch (err) {
+
+              // If an error happen, pause automatic interval pulling
+              this.forcePause_ = true;
+
+              errorBody = JSON.parse(err.body);
+
+              const { error } = errorBody;
+              const { errors } = error;
+
+              // Check if the request must be retried (waiting exponentially)
+              const retryExp = errors.some(({ reason }) => retryExpErrors.includes(reason));
+
+              if (!retryExp) {
+
+                // Check if the request must be retried (only once)
+                this.retryOnce_ = errors.some(({ reason }) => retryOnceErrors.includes(reason));
+
+                if (!this.retryOnce_) {
+                  // The error is "big", the request must not be retried,
+                  // break the loop
+                  break;
+                }
+
+              }
+
+              if (this.retryOnce_ && i > 1) {
+                // This request must be retried only once, 
+                // and this is the third attempt
+                // break the loop
+                break;
+              }
+
+              // random_number_ms is a random number of milliseconds less than or equal to 1000.
+              // This is necessary to avoid certain lock errors in some concurrent implementations.
+              const random_number_ms = ~~(Math.random() * 1000);
+
+              // Exponential wait in milliseconds
+              const wait = Math.pow(2, i) * 1000;
+
+              await sleep(Math.round(wait + random_number_ms));
+
+            }
+
+          }
+
+          this.onError_(errorBody);
+
+        },
+
+        /**
+         * The makeRequest_ method makes API requests and emits
+         * the response.
+         */
+        makeRequest_: function (options, pollingInterval) {
+          return new Promise((resolve, reject) => {
+            console.log('request')
+            gapi.client.analytics.data.realtime
+              .get({ ids: options.ids, metrics: options.query.metrics, dimensions: options.query.dimensions })
+              .then((response) => {
+                // If everything is ok, reinitialize
+                if (this.polling_ && !this.forcePause_) {
+                  this.timeout_ = setTimeout(this.pollrealTime_.bind(this),
+                    pollingInterval);
+                }
+                resolve(response.result);
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          })
+        },
+
+        onSuccess_: function (data) {
+          this.emit('success', data);
+        },
+
+        onError_: function (err) {
+          this.emit('error', err);
         },
 
         handleSignOut_: function () {
@@ -157,6 +263,7 @@ const CLASSES = {
   error: BASE_CLASS + '_error',
   errorContainer: BASE_CLASS + '_error-container',
   errorMsg: BASE_CLASS + '_error-msg',
+
   loading: BASE_CLASS + '_loading',
   loader: BASE_CLASS + '_loader',
 
@@ -193,14 +300,25 @@ export class GoogleDataRT extends React.Component {
     classVariation: null
   };
 
+  realTime = {};
+  pause = this.pause.bind(this);
+  resume = this.resume.bind(this);
+
+  pause() {
+    console.log('blur')
+    this.realTime.pause();
+  };
+
+  resume() {
+    console.log('focus')
+    if (this.realTime.polling_) {
+      this.realTime.execute();
+    }
+  };
+
+
   componentDidMount() {
-    const checkExist = setInterval(() => {
-      // Wait until this component is loaded
-      if (typeof gapi.analytics.ext !== undefined) {
-        clearInterval(checkExist);
-        this.loadData();
-      }
-    }, 100)
+    this.loadData();
   };
 
   componentWillUpdate(_, nextState) {
@@ -235,9 +353,72 @@ export class GoogleDataRT extends React.Component {
   };
 
   componentWillUnmount() {
-    // TODO: cleanup
+
+    this.realTime.off('success');
+    this.realTime.off('error');
+
+    window.removeEventListener('blur', this.pause, false);
+    window.removeEventListener('focus', this.resume, false);
+
   };
 
+  loadData = () => {
+    const config = {
+      ...this.props.config
+    };
+
+    this.realTime = new gapi.analytics.ext.RealTime(config)
+      .on('success', ({ realTime }) => {
+
+        let rawValue;
+        this.setState({ isLoading: false });
+
+        // If the response has multiples columns
+        if (realTime.columnHeaders.length > 1) {
+
+          rawValue = JSON.stringify(realTime.rows);
+          // If values hasn't changed, do nothing
+          if (this.state.rawValue === rawValue) {
+            return;
+          }
+
+        } else {
+
+          rawValue = realTime.totalResults ? +realTime.rows[0][0] : 0;
+          // If values hasn't changed, do nothing
+          if (this.state.rawValue === rawValue) {
+            return;
+          }
+
+        }
+
+        const visualization = this.dataToVisualization(realTime);
+        this.setState({ rawValue: rawValue, visualization: visualization });
+
+      })
+
+      .on('error', ({ error }) => {
+        this.setState({
+          isError: error.message,
+          isLoading: false
+        })
+      })
+
+    window.addEventListener('blur', this.pause, false);
+    window.addEventListener('focus', this.resume, false);
+
+    this.updateView();
+
+  };
+
+  updateView = () => {
+    this.setState({
+      isError: false,
+      isLoading: true
+    });
+
+    this.realTime.set(this.props.views.query).execute();
+  };
 
   /**
    * Creates a simple table to show results with multiples columns (dimensions),
@@ -268,7 +449,7 @@ export class GoogleDataRT extends React.Component {
     // Simple result
     if (realTimeData.columnHeaders.length === 1) {
 
-      const count = realTimeData.totalResults ? +realTimeData.rows[0][0] : 0;
+      const count = realTimeData.totalResults ? +realTimeData.rows[0][0] : 0 + 0;
       return (
         <span className={CLASSES.rtValueNumber}>{count}</span>
       )
@@ -284,8 +465,8 @@ export class GoogleDataRT extends React.Component {
                 // Get the headers
                 realTimeData.columnHeaders.map((column, key) => {
                   let columnName = column.name.replace('rt:', '');
-                  columnName = columnName.charAt(0).toUpperCase() + columnName.slice(1)
-                  columnName = columnName.replace(/([A-Z])/g, ' $1').trim()
+                  columnName = columnName.charAt(0).toUpperCase() + columnName.slice(1);
+                  columnName = columnName.replace(/([A-Z])/g, ' $1').trim();
                   return <th key={key}>{columnName}</th>;
                 })
               }
@@ -300,7 +481,7 @@ export class GoogleDataRT extends React.Component {
                 // Otherwise, loop between results
                 realTimeData.rows.map((row, key) => {
                   return (
-                    <tr>
+                    <tr key={key}>
                       {
                         row.map((cell, key2) => {
                           return <td key={key + ' ' + key2}>{cell}</td>;
@@ -315,62 +496,6 @@ export class GoogleDataRT extends React.Component {
       )
     }
 
-  };
-
-  loadData = () => {
-    const config = {
-      ...this.props.config
-    };
-
-    this.realTime = new gapi.analytics.ext.RealTime(config)
-
-      .on('success', ({ realTime }) => {
-
-        let rawValue;
-        this.setState({ isLoading: false });
-
-        // If the response has multiples columns
-        if (realTime.columnHeaders.length > 1) {
-
-          rawValue = JSON.stringify(realTime.rows);
-          // If values hasn't changed, do nothing
-          if (this.state.rawValue === rawValue) {
-            return;
-          }
-
-        } else {
-
-          rawValue = realTime.totalResults ? +realTime.rows[0][0] : 0;
-          // If values hasn't changed, do nothing
-          if (this.state.rawValue === rawValue) {
-            return;
-          }
-
-        }
-
-        const visualization = this.dataToVisualization(realTime);
-        this.setState({ rawValue, visualization });
-
-      })
-
-      .on('error', ({ error }) => {
-        this.setState({
-          isError: error.message,
-          isLoading: false
-        })
-      })
-
-    this.updateView();
-
-  };
-
-  updateView = () => {
-    this.setState({
-      isError: false,
-      isLoading: true
-    });
-
-    this.realTime.set(this.props.views.query).execute();
   };
 
   render() {
@@ -446,7 +571,8 @@ export class GoogleDataChart extends React.Component {
   };
 
   componentWillUnmount() {
-    // TODO: cleanup
+    this.realTime.off('success');
+    this.realTime.off('error');
   };
 
   loadChart = () => {

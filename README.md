@@ -45,28 +45,85 @@ Also, add the Google SDK at the top of your page
 ## Usage
 ### Customizable props
 You can pass custom props to customize the visualizations.
+#### Data configuration
 ```js
-// CUSTOM LOADER
+// Last 30 days analytics
+const last30days = {
+  query: {
+    dimensions: "ga:date",
+    metrics: "ga:pageviews",
+    "start-date": "30daysAgo",
+    "end-date": "yesterday"
+  },
+  chart: {
+    type: "LINE", // Possible options are: LINE, COLUMN, BAR, TABLE, and GEO.
+    options: {
+      // options for google charts
+      // https://google-developers.appspot.com/chart/interactive/docs/gallery
+      title: "Last 30 days pageviews"
+    }
+  }
+};
+
+// Realtime users
+const activeUsers = {
+  pollingInterval: 5, // 5 seconds minimum
+  options: {
+    title: 'Realtime users'
+  },
+  query: {
+    metrics: 'rt:activeUsers'
+  }
+};
+
+// ...
+<GoogleDataChart config={last30days} ... />
+<GoogleDataRt config={activeUsers} ... />
+// ...
+```
+
+#### Views
+```js
+// analytics views ID
+const views = {
+  query: {
+    ids: "ga:87986986"
+  }
+};
+// ...
+<GoogleDataChart views={views} ... />
+<GoogleDataRT views={views} ... />
+// ...
+```
+
+#### Loader
+```js
 // By default a css spinner is used
 const loader = '<span>Loading...</span>';
 // ...
 <GoogleDataChart loader={loader} ... />
 <GoogleDataRT loader={loader} ... />
 // ...
+```
 
-// ERRORS
+#### Errors
+```js
 // By default the errors are hidden (quota, bad view id, insufficient permissions, missing or wrong parameters, etc)
-)
-<GoogleDataRT errors={true} ... />
+// ...
+const errors = true;
+<GoogleDataRT errors={errors} ... />
+// ...
+```
 
-// CUSTOMIZABLE OUTPUT in GoogleDataRT
+#### Custom output (only in GoogleDataRT)
+```js
 /**
  * RealTime data is not supported by the official DataChart api,
  * so we have to make custom visualizations. These values
  * can be returned as an unique number (a total count)
  * or as multiples columns (dimensions) that can been displayed as tables or charts.
- * By default the data is displayed as a number or a table in each case,
- * but you can customize the api response visualization passing this prop.
+ * By default the data is visualizated as a number or a table in each case,
+ * but you can customize the api's response visualization using this prop.
  * 
  * @param {object} realTimeData Google Api response
  * @param {array}  realTimeData.columnHeaders Name of the columns returned
@@ -78,7 +135,7 @@ const loader = '<span>Loading...</span>';
  * @param {string} realTimeData.selfLink
  * @param {number} realTimeData.totalResults Total count
  * @param {object} realTimeData.totalsForAllResults
- * @returns {component}
+ * @returns {Component}
  */
  const customOutput = (realTimeData) => { 
   return (
@@ -90,20 +147,17 @@ const loader = '<span>Loading...</span>';
 // ...
 <GoogleDataRT customOutput={customOutput} ... />
 // ...
-
 ```
 
 ### OAUTH authentication
 
 ```js
-
 import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget';
 
 const CLIENT_ID = 'x-x--x---x---x-xx--x-apps.googleusercontent.com';
 
 // graph 1 config
 const last30days = {
-  reportType: "ga",
   query: {
     dimensions: "ga:date",
     metrics: "ga:pageviews",
@@ -118,58 +172,31 @@ const last30days = {
       title: "Last 30 days pageviews"
     }
   }
-}
+};
 
 // graph 2 config
-const last7days = {
-  reportType: "ga",
-  query: {
-    dimensions: "ga:date",
-    metrics: "ga:pageviews",
-    "start-date": "7daysAgo",
-    "end-date": "yesterday"
-  },
-  chart: {
-    type: "LINE"
-  }
-}
-
-// graph 3 realtime users
-const activeUsers = {
-  pollingInterval: 5, // 5 seconds minimum
+const realTimeBrowsers = {
+  pollingInterval: 1000,
   options: {
-    title: 'Realtime users'
-  },
-  query: {
-    metrics: 'rt:activeUsers'
-  }
-}
-
-// graph 4 realtime active browsers
-const activeBrowsers = {
-  pollingInterval: 5, // 5 seconds minimum
-  options: {
-    title: 'Realtime browsers'
+    title: "Realtime browsers"
   },
   query: {
     metrics: 'rt:activeUsers',
     dimensions: 'rt:browser'
   }
-}
+};
 
 // analytics views ID
 const views = {
   query: {
     ids: "ga:87986986"
   }
-}
+};
 
 const Example = () => (
   <GoogleProvider clientId={CLIENT_ID}>
     <GoogleDataChart views={views} config={last30days} />
-    <GoogleDataChart views={views} config={last7days} />
-    <GoogleDataRT views={views} config={activeUsers} />
-    <GoogleDataRT views={views} config={activeBrowsers} />
+    <GoogleDataRT views={views} config={realTimeBrowsers} />
   </GoogleProvider>
 )
 ```
@@ -177,32 +204,11 @@ const Example = () => (
 ### Server-side token authentication
 
 ```js
-
 import React, { Component } from 'react';
-import { GoogleProvider, GoogleDataChart } from 'react-analytics-widget'
+import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget'
 
 // graph 1 config
-const last30days = {
-  reportType: "ga",
-  query: {
-    dimensions: "ga:date",
-    metrics: "ga:pageviews",
-    "start-date": "30daysAgo",
-    "end-date": "yesterday"
-  },
-  chart: {
-    type: "LINE",
-    options: {
-      // options for google charts
-      // https://google-developers.appspot.com/chart/interactive/docs/gallery
-      title: "Last 30 days pageviews"
-    }
-  }
-}
-
-// graph 2 config
 const last7days = {
-  reportType: "ga",
   query: {
     dimensions: "ga:date",
     metrics: "ga:pageviews",
@@ -212,38 +218,26 @@ const last7days = {
   chart: {
     type: "LINE"
   }
-}
+};
 
-
-// graph 3 realtime users
-const activeUsers = {
-  pollingInterval: 5, // 5 seconds minimum
+// graph 2 config
+const realTimeBrowsers = {
+  pollingInterval: 1000,
   options: {
-    title: 'Realtime users'
-  },
-  query: {
-    metrics: 'rt:activeUsers'
-  }
-}
-
-// graph 4 realtime active browsers
-const activeBrowsers = {
-  pollingInterval: 5, // 5 seconds minimum
-  options: {
-    title: 'Realtime browsers'
+    title: "Realtime browsers"
   },
   query: {
     metrics: 'rt:activeUsers',
     dimensions: 'rt:browser'
   }
-}
+};
 
 // analytics views ID
 const views = {
   query: {
     ids: "ga:87986986"
   }
-}
+};
 
 class Example extends Component {
   componentDidMount = () => {
@@ -255,17 +249,15 @@ class Example extends Component {
       .then(({ token }) => {
         this.setState({ token }); // TODO: handle errors
       });
-  }
+  };
 
   render = () => (
     <GoogleProvider accessToken={this.state.token}>
-      <GoogleDataChart views={views} config={last30days} />
       <GoogleDataChart views={views} config={last7days} />
-      <GoogleDataLive views={views} config={activeUsers} />
-      <GoogleDataRT views={views} config={activeBrowsers} />
+      <GoogleDataRT views={views} config={realTimeBrowsers} />
     </GoogleProvider>
   )
-}
+};
 ```
 
 [npm-badge]: https://img.shields.io/npm/v/react-analytics-widget.png?style=flat-square
