@@ -1,0 +1,183 @@
+$base-color: #058dc7
+$decreasing-color: rgba(255, 0, 0, 0.5)
+$increasing-color: rgba(0, 128, 0, 0.5)
+
+.analyticsWidget
+  font-family: Arial, Helvetica, sans-serif
+
+.analyticsWidgetChart
+  min-height: 250px
+  min-width: 100px
+
+.analyticsWidgetRT
+  min-width: 90px
+  min-height: 35px
+  font-size: 13px
+
+  .RTValue
+    text-align: center
+    font-weight: 300
+    white-space: nowrap
+
+    .RTValueNumber
+      font-size: 30px
+
+  .RTTitle
+    text-align: left
+    font-size: 16px
+    margin: 0px 0 10px
+
+  .RTTable
+    border-radius: 5px
+    border-collapse: collapse
+    width: 100%
+
+    td, th
+      border: 1px solid #ddd
+      padding: 8px
+
+    tr:nth-child(even)
+      background-color: #f2f2f2
+
+    th
+      padding-top: 12px
+      padding-bottom: 12px
+      text-align: left
+      background-color: $base-color
+      color: white
+
+  .isIncreasing
+    -webkit-animation: a 3s
+    animation: a 3s
+
+  .isDecreasing
+    -webkit-animation: b 3s
+    animation: b 3s
+
+  @-webkit-keyframes a
+    10%
+      background-color: transparent
+      border-color: $increasing-color
+      color: green
+
+  @keyframes a
+    10%
+      background-color: transparent
+      border-color: $increasing-color
+      color: green
+
+  @-webkit-keyframes b
+    10%
+      background-color: transparent
+      border-color: $decreasing-color
+      color: red
+
+  @keyframes b
+    10%
+      background-color: transparent
+      border-color: $decreasing-color
+      color: red
+
+.onLoading
+  .widgetChartContainer, .widgetRTContainer
+    visibility: hidden
+
+.onError
+  .widgetChartContainer, .widgetRTContainer
+    visibility: hidden
+
+  background: #f6f6f6
+
+.errorContainer
+  left: 0
+  right: 0
+  top: 0
+  bottom: 0
+  position: absolute
+  font-size: 13px
+  align-items: center
+  display: flex
+  justify-content: center
+  color: #777777
+  overflow: hidden
+
+  .errorMsg
+    width: 80%
+    margin-top: 70px
+    text-overflow: ellipsis
+    white-space: pre-wrap
+    overflow: hidden
+    font-size: 12px
+    text-align: center
+
+  .errorCircle
+    user-select: none
+    cursor: default
+    width: 25px
+    height: 25px
+    line-height: 25px
+    background: #c7c7c7
+    border-radius: 50%
+    color: #fff
+    font-size: 11px
+    font-family: verdana
+    text-align: center
+    left: 0
+    right: 0
+    bottom: 0
+    top: 0
+    margin: auto
+    position: absolute
+
+.loader
+  left: 0
+  right: 0
+  top: 50%
+  transform: translateY(-50%)
+  position: absolute
+  text-align: center
+  color: #000
+  font-family: sans-serif
+  font-size: 13px
+
+  .loaderSpinner
+    border-radius: 50%
+    width: 2.1em
+    height: 2.1em
+
+    &:after
+      border-radius: 50%
+      width: 2.1em
+      height: 2.1em
+
+    margin: auto
+    font-size: 9px
+    position: relative
+    text-indent: -9999em
+    border-top: 1em solid rgba(255, 255, 255, 0.2)
+    border-right: 1em solid rgba(255, 255, 255, 0.2)
+    border-bottom: 1em solid rgba(255, 255, 255, 0.2)
+    border-left: 1em solid $base-color
+    -webkit-transform: translateZ(0)
+    -ms-transform: translateZ(0)
+    transform: translateZ(0)
+    -webkit-animation: load8 0.5s infinite linear
+    animation: load8 0.5s infinite linear
+
+  @-webkit-keyframes load8
+    0%
+      -webkit-transform: rotate(0deg)
+      transform: rotate(0deg)
+
+    100%
+      -webkit-transform: rotate(360deg)
+      transform: rotate(360deg)
+
+  @keyframes load8
+    0%
+      -webkit-transform: rotate(0deg)
+      transform: rotate(0deg)
+
+    100%
+      -webkit-transform: rotate(360deg)
+      transform: rotate(360deg)

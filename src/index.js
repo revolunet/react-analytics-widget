@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './analytics-widget.css';
+import styles from './analytics-widget.sass';
 
 // dont wait for auth twice, even after unmounts
 let isLoaded = false;
@@ -163,7 +163,7 @@ export class GoogleProvider extends React.Component {
             }
 
           }
-
+          
           this.onError_(errorBody);
 
         },
@@ -256,32 +256,8 @@ GoogleProvider.propTypes = {
   accessToken: PropTypes.string,
 }
 
-const BASE_CLASS = 'analytics-widget';
-const CLASSES = {
-  widget: BASE_CLASS,
-
-  error: BASE_CLASS + '_error',
-  errorContainer: BASE_CLASS + '_error-container',
-  errorMsg: BASE_CLASS + '_error-msg',
-
-  loading: BASE_CLASS + '_loading',
-  loader: BASE_CLASS + '_loader',
-
-  widgetChart: BASE_CLASS + '_widget-chart',
-  chartContainer: BASE_CLASS + '_widget-chart_container',
-
-  widgetRt: BASE_CLASS + '_widget-rt',
-  rtContainer: BASE_CLASS + '_widget-rt_container',
-  rtTable: BASE_CLASS + '_widget-rt_table',
-  rtTitle: BASE_CLASS + '_widget-rt_title',
-  rtValue: BASE_CLASS + '_widget-rt_value',
-  rtValueNumber: BASE_CLASS + '_widget-rt_value-number',
-  rtIncreasing: BASE_CLASS + '_widget-rt_is-increasing',
-  rtDecreasing: BASE_CLASS + '_widget-rt_is-decreasing',
-}
-
-const DEFAULT_LOADING = <div className={CLASSES.loader + '-spinner'}></div>
-const DEFAULT_ERROR = <div className={CLASSES.widget + '_error-circle'}><div>X</div></div>
+const DEFAULT_LOADING = <div className={styles.loaderSpinner}></div>
+const DEFAULT_ERROR = <div className={styles.errorCircle}><div>X</div></div>
 const DEFAULT_CHART = {
   type: "LINE",
   options: {
@@ -300,22 +276,26 @@ export class GoogleDataRT extends React.Component {
     classVariation: null
   };
 
-  realTime = {};
-  pause = this.pause.bind(this);
-  resume = this.resume.bind(this);
+  pausePolling = this.pausePolling.bind(this);
+  resumePolling = this.resumePolling.bind(this);
+  stopPolling = this.stopPolling.bind(this);
 
-  pause() {
+  pausePolling() {
     console.log('blur')
     this.realTime.pause();
   };
 
-  resume() {
+  stopPolling() {
+    console.log('stop')
+    this.realTime.stop();
+  };
+
+  resumePolling() {
     console.log('focus')
     if (this.realTime.polling_) {
       this.realTime.execute();
     }
   };
-
 
   componentDidMount() {
     this.loadData();
@@ -332,7 +312,7 @@ export class GoogleDataRT extends React.Component {
         let timeout;
 
         // Add CSS animation to visually show the when the counter goes up and down
-        const animationClass = delta >= 0 ? CLASSES.rtIncreasing : CLASSES.rtDecreasing;
+        const animationClass = delta >= 0 ? styles.isIncreasing : styles.isDecreasing 
         this.setState({ classVariation: animationClass })
 
         clearTimeout(timeout);
@@ -354,11 +334,13 @@ export class GoogleDataRT extends React.Component {
 
   componentWillUnmount() {
 
+    this.realTime.stop();
+
     this.realTime.off('success');
     this.realTime.off('error');
 
-    window.removeEventListener('blur', this.pause, false);
-    window.removeEventListener('focus', this.resume, false);
+    window.removeEventListener('blur', this.pausePolling, false);
+    window.removeEventListener('focus', this.resumePolling, false);
 
   };
 
@@ -404,10 +386,10 @@ export class GoogleDataRT extends React.Component {
         })
       })
 
-    window.addEventListener('blur', this.pause, false);
-    window.addEventListener('focus', this.resume, false);
-
     this.updateView();
+
+    window.addEventListener('blur', this.pausePolling, false);
+    window.addEventListener('focus', this.resumePolling, false);
 
   };
 
@@ -451,14 +433,14 @@ export class GoogleDataRT extends React.Component {
 
       const count = realTimeData.totalResults ? +realTimeData.rows[0][0] : 0 + 0;
       return (
-        <span className={CLASSES.rtValueNumber}>{count}</span>
+        <span className={styles.RTValueNumber}>{count}</span>
       )
 
       // Complex result
     } else {
 
       return (
-        <table className={CLASSES.rtTable}>
+        <table className={styles.RTTable}>
           <tbody>
             <tr>
               {
@@ -499,9 +481,9 @@ export class GoogleDataRT extends React.Component {
   };
 
   render() {
-    const classes = [CLASSES.widget, CLASSES.widgetRt];
-    if (this.state.isError) classes.push(CLASSES.error);
-    if (this.state.isLoading) classes.push(CLASSES.loading);
+    const classes = [styles.analyticsWidget, styles.analyticsWidgetRT];
+    if (this.state.isError) classes.push(styles.onError);
+    if (this.state.isLoading) classes.push(styles.onLoading);
     if (this.props.className) classes.push(this.props.className);
     if (this.state.classVariation) classes.push(this.state.classVariation);
 
@@ -510,25 +492,25 @@ export class GoogleDataRT extends React.Component {
         className={classes.join(' ')}
         style={{ ...this.props.style, position: 'relative' }}
       >
-        <div className={CLASSES.rtContainer}>
+        <div className={styles.widgetRTContainer}>
           {
             this.props.config.options && this.props.config.options.title &&
-            <div className={CLASSES.rtTitle}>{this.props.config.options.title}</div>
+            <div className={styles.RTTitle}>{this.props.config.options.title}</div>
           }
-          <div className={CLASSES.rtValue}>
+          <div className={styles.RTValue}>
             {this.state.visualization}
           </div>
         </div>
         {
           this.state.isLoading &&
-          <div className={CLASSES.loader}>{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
+          <div className={styles.loader}>{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
         }
         {
           this.state.isError &&
-          <div title={(this.props.errors) ? this.state.isError : ''} className={CLASSES.errorContainer}>
+          <div title={(this.props.errors) ? this.state.isError : ''} className={styles.errorContainerr}>
             {
               this.props.errors &&
-              <div className={CLASSES.errorMsg}>{this.state.isError}</div>
+              <div className={styles.errorMsg}>{this.state.isError}</div>
             }
             {DEFAULT_ERROR}
           </div>
@@ -613,9 +595,9 @@ export class GoogleDataChart extends React.Component {
 
   render() {
 
-    const classes = [CLASSES.widget, CLASSES.widgetChart];
-    if (this.state.isError) classes.push(CLASSES.error);
-    if (this.state.isLoading) classes.push(CLASSES.loading);
+    const classes = [styles.analyticsWidget, styles.analyticsWidgetChart];
+    if (this.state.isError) classes.push(styles.onError);
+    if (this.state.isLoading) classes.push(styles.onLoading);
     if (this.props.className) classes.push(this.props.className);
 
     return (
@@ -624,19 +606,19 @@ export class GoogleDataChart extends React.Component {
         className={classes.join(' ')}
       >
         <div
-          className={CLASSES.chartContainer}
+          className={styles.widgetChartContainer}
           ref={node => (this.chartNode = node)}
         />
         {
           this.state.isLoading &&
-          <div className={CLASSES.loader}>{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
+          <div className={styles.loader}>{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
         }
         {
           this.state.isError &&
-          <div title={(this.props.errors) ? this.state.isError : ''} className={CLASSES.errorContainer}>
+          <div title={(this.props.errors) ? this.state.isError : ''} className={styles.errorContainer}>
             {
               this.props.errors &&
-              <div className={CLASSES.errorMsg}>{this.state.isError}</div>
+              <div className={styles.errorMsg}>{this.state.isError}</div>
             }
             {DEFAULT_ERROR}
           </div>
