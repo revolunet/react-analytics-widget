@@ -1,33 +1,33 @@
-$base-color: #058dc7
+$base-color: rgb(5, 141, 199)
 $decreasing-color: rgba(255, 0, 0, 0.5)
 $increasing-color: rgba(0, 128, 0, 0.5)
 
-.analyticsWidget
+.widgetAnalytics_widget
   font-family: Arial, Helvetica, sans-serif
 
-.analyticsWidgetChart
-  min-height: 250px
+.widgetAnalytics_widgetChart
+  min-height: 100px
   min-width: 100px
 
-.analyticsWidgetRT
+.widgetAnalytics_widgetRealTime
   min-width: 90px
   min-height: 35px
   font-size: 13px
 
-  .RTValue
+  .widgetAnalytics_realTimeValue
     text-align: center
     font-weight: 300
     white-space: nowrap
 
-    .RTValueNumber
+    .widgetAnalytics_realTimeValueNumber
       font-size: 30px
 
-  .RTTitle
+  .widgetAnalytics_realTimeTitle
     text-align: left
     font-size: 16px
     margin: 0px 0 10px
 
-  .RTTable
+  .widgetAnalytics_realTimeTable
     border-radius: 5px
     border-collapse: collapse
     width: 100%
@@ -46,49 +46,45 @@ $increasing-color: rgba(0, 128, 0, 0.5)
       background-color: $base-color
       color: white
 
-  .isIncreasing
-    -webkit-animation: a 3s
-    animation: a 3s
+.widgetAnalytics_isIncreasing
+  -webkit-animation: a 3s
+  animation: a 3s
 
-  .isDecreasing
-    -webkit-animation: b 3s
-    animation: b 3s
+.widgetAnalytics_isDecreasing
+  -webkit-animation: b 3s 
+  animation: b 3s
 
-  @-webkit-keyframes a
-    10%
-      background-color: transparent
-      border-color: $increasing-color
-      color: green
+@-webkit-keyframes a
+  10%
+    background-color: $increasing-color
+    color: #fff
 
-  @keyframes a
-    10%
-      background-color: transparent
-      border-color: $increasing-color
-      color: green
+@keyframes a
+  10%
+    background-color: $increasing-color
+    color: #fff
 
-  @-webkit-keyframes b
-    10%
-      background-color: transparent
-      border-color: $decreasing-color
-      color: red
+@-webkit-keyframes b
+  10%
+    background-color: $decreasing-color
+    color: #fff
 
-  @keyframes b
-    10%
-      background-color: transparent
-      border-color: $decreasing-color
-      color: red
+@keyframes b
+  10%
+    background-color: $decreasing-color
+    color: #fff
 
-.onLoading
-  .widgetChartContainer, .widgetRTContainer
+.widgetAnalytics_onLoading
+  .widgetAnalytics_widgetChartContainer, .widgetAnalytics_widgetRealTimeContainer
     visibility: hidden
 
-.onError
-  .widgetChartContainer, .widgetRTContainer
+.widgetAnalytics_onError
+  .widgetAnalytics_widgetChartContainer, .widgetAnalytics_widgetRealTimeContainer
     visibility: hidden
 
   background: #f6f6f6
 
-.errorContainer
+.widgetAnalytics_errorContainer
   left: 0
   right: 0
   top: 0
@@ -101,7 +97,7 @@ $increasing-color: rgba(0, 128, 0, 0.5)
   color: #777777
   overflow: hidden
 
-  .errorMsg
+  .widgetAnalytics_errorMsg
     width: 80%
     margin-top: 70px
     text-overflow: ellipsis
@@ -110,7 +106,7 @@ $increasing-color: rgba(0, 128, 0, 0.5)
     font-size: 12px
     text-align: center
 
-  .errorCircle
+  .widgetAnalytics_errorCircle
     user-select: none
     cursor: default
     width: 25px
@@ -129,7 +125,7 @@ $increasing-color: rgba(0, 128, 0, 0.5)
     margin: auto
     position: absolute
 
-.loader
+.widgetAnalytics_loader
   left: 0
   right: 0
   top: 50%
@@ -138,9 +134,9 @@ $increasing-color: rgba(0, 128, 0, 0.5)
   text-align: center
   color: #000
   font-family: sans-serif
-  font-size: 13px
+  font-size: 13px 
 
-  .loaderSpinner
+  .widgetAnalytics_loaderSpinner
     border-radius: 50%
     width: 2.1em
     height: 2.1em

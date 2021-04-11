@@ -19,21 +19,27 @@
     "umd"
   ],
   "scripts": {
-    "build": "nwb build-react-component --copy-files",
-    "clean": "nwb clean-module && nwb clean-demo",
-    "start": "nwb serve-react-demo",
+    "build": "npm-run-all build-css build-js",
+    "build-js": "nwb build-react-component --copy-files",
+    "clean": "nwb clean-module && nwb clean-demo && nwb clean-css",
+    "start": "npm-run-all -p watch-css start-js",
+    "start-js": "nwb serve-react-demo",
     "test": "nwb test-react",
     "publish": "gh-pages -d demo/dist && git push",
     "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server"
+    "test:watch": "nwb test-react --server",
+    "build-css": "node-sass-chokidar src/styles/src -o src/styles",
+    "watch-css": "npm run build-css && node-sass-chokidar src/styles/src -o src/styles --watch --recursive --use-polling --polling-interval 1000"
   },
   "peerDependencies": {
     "react": "15.x"
   },
   "devDependencies": {
     "gh-pages": "^1.0.0",
+    "mini-css-extract-plugin": "^1.4.1",
+    "node-sass-chokidar": "^1.5.0",
+    "npm-run-all": "^4.1.5",
     "nwb": "^0.25.2",
-    "nwb-sass": "^0.10.2",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -45,5 +51,6 @@
     "react-component",
     "analytics",
     "widget"
-  ]
+  ],
+  "dependencies": {}
 }

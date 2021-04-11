@@ -7,6 +7,7 @@ Embed Google Analytics widgets in your React applications.
  - The `GoogleProvider` container ensure user is logged on analytics
  - The `GoogleDataChart` component display any [DataChart configuration](https://developers.google.com/analytics/devguides/reporting/embed/v1/component-reference#datachart)
  - The `GoogleDataRT` component display any [RealTime](https://developers.google.com/analytics/devguides/reporting/realtime/dimsmets/) data
+ - The `css` component it's a basic style to allow a basic interface the interface.
 
 
 ![](./demo.png)
@@ -152,7 +153,7 @@ const errors = true;
 ### OAUTH authentication
 
 ```js
-import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget';
+import { GoogleProvider, GoogleDataChart, GoogleDataRT, css } from 'react-analytics-widget';
 
 const CLIENT_ID = 'x-x--x---x---x-xx--x-apps.googleusercontent.com';
 
@@ -205,7 +206,7 @@ const Example = () => (
 
 ```js
 import React, { Component } from 'react';
-import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget'
+import { GoogleProvider, GoogleDataChart, GoogleDataRT, css } from 'react-analytics-widget'
 
 // graph 1 config
 const last7days = {

@@ -85,7 +85,7 @@ const REAL_TIME = [
   },
   {
     pollingInterval: 10,
-    options: {
+    options: { 
       title: "Active users"
     },
     query: {
@@ -124,7 +124,7 @@ class Example extends React.Component {
     return (
       <div>
         <GithubCorner href="https://github.com/revolunet/react-analytics-widget" />
-        <GoogleProvider accessToken={this.state.token}>
+        <GoogleProvider accessToken={this.state.token}> 
           <div style={{ margin: '20px 0' }}>
             Define your view ID :
             <input type="text" onChange={e => this.setState({ ids: e.target.value })} value={this.state.ids} />
@@ -132,7 +132,7 @@ class Example extends React.Component {
             <br />
           </div>
           <div>
-            {/* {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true}/>)} */}
+            {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true}/>)}
           </div>
           <div>
             <GoogleDataRT style={{ verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[0]} errors={true}/>
