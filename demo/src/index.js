@@ -85,14 +85,32 @@ const REAL_TIME = [
   },
   {
     pollingInterval: 10,
-    options: { 
+    options: {
       title: "Active users"
     },
     query: {
       metrics: 'rt:activeUsers'
     }
+  },
+  {
+    pollingInterval: 10,
+    options: {
+      title: "User Types (custom output)"
+    },
+    query: {
+      metrics: 'rt:activeUsers',
+      dimensions: 'rt:userType'
+    }
   }
 ]
+const customOutput = (realTimeData) => {
+  return (
+    <div>
+      <pre>{(realTimeData.columnHeaders) ? JSON.stringify(realTimeData.columnHeaders,  undefined, 2) : 'No results'}</pre>
+      <pre>{(realTimeData.rows) ? JSON.stringify(realTimeData.rows, undefined, 2) : 'No results'}</pre>
+    </div>
+  )
+}
 
 class Example extends React.Component {
   state = {
@@ -110,7 +128,7 @@ class Example extends React.Component {
       .then(({ token }) => {
         this.setState({ token }); // TODO: handle errors
       })
-      .catch( err => {
+      .catch(err => {
         console.error(err)
       })
   }
@@ -124,7 +142,7 @@ class Example extends React.Component {
     return (
       <div>
         <GithubCorner href="https://github.com/revolunet/react-analytics-widget" />
-        <GoogleProvider accessToken={this.state.token}> 
+        <GoogleProvider accessToken={this.state.token}>
           <div style={{ margin: '20px 0' }}>
             Define your view ID :
             <input type="text" onChange={e => this.setState({ ids: e.target.value })} value={this.state.ids} />
@@ -132,11 +150,12 @@ class Example extends React.Component {
             <br />
           </div>
           <div>
-            {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true}/>)}
+            {CHARTS.map((c, i) => <GoogleDataChart style={{ verticalAlign: 'top', display: 'inline-block', width: 350, margin: 20, border: '1px solid #eee', padding: 10 }} key={i} views={views} config={c} errors={true} />)}
           </div>
           <div>
-            <GoogleDataRT style={{ verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[0]} errors={true}/>
-            <GoogleDataRT style={{ backgroundColor: '#058dc7', color: '#fff', verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[1]} errors={true}/>
+            <GoogleDataRT style={{ verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[0]} errors={true} />
+            <GoogleDataRT style={{ textAlign: 'center', backgroundColor: '#058dc7', color: '#fff', verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[1]} errors={true} />
+            <GoogleDataRT customOutput={customOutput} style={{ backgroundColor: '#f8f8f8', width: 250, overflow: 'hidden', wordBreak: 'break-all', verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[2]} errors={true} />
           </div>
         </GoogleProvider>
       </div>

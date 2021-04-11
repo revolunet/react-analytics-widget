@@ -17,9 +17,9 @@ export class GoogleDataRT extends React.Component {
     isError: false,
     isLoading: true,
     visualization: null,
-    classVariation: null
+    deltaClass: null
   };
-  
+
   pausePolling = this.pausePolling.bind(this);
   resumePolling = this.resumePolling.bind(this);
   stopPolling = this.stopPolling.bind(this);
@@ -80,26 +80,26 @@ export class GoogleDataRT extends React.Component {
         const visualization = this.dataToVisualization(realTime);
         const value = realTime.totalResults ? +realTime.rows[0][0] : 0;
 
-        let classVariation;
+        let deltaClass;
 
         // Check if the response has multiples columns or only one
         if ((realTime.columnHeaders.length === 1)) {
 
           const delta = value - (this.lastValue | 0);
-         
+
           // Add CSS animation to visually show the when the counter goes up and down
-          classVariation = delta > 0 ? "widgetAnalytics_isIncreasing" : "widgetAnalytics_isDecreasing";
-          
-          let timeout; 
+          deltaClass = delta > 0 ? "widgetAnalytics_isIncreasing" : "widgetAnalytics_isDecreasing";
+
+          let timeout;
           clearTimeout(timeout);
           timeout = setTimeout(() => {
-            this.setState({ classVariation: null })
+            this.setState({ deltaClass: null })
           }, 3000);
 
           this.lastValue = value;
         }
 
-        this.setState({ visualization, classVariation });
+        this.setState({ visualization, deltaClass });
 
       })
 
@@ -209,7 +209,7 @@ export class GoogleDataRT extends React.Component {
     if (this.state.isError) classes.push("widgetAnalytics_onError");
     if (this.state.isLoading) classes.push("widgetAnalytics_onLoading");
     if (this.props.className) classes.push(this.props.className);
-    if (this.state.classVariation) classes.push(this.state.classVariation);
+    if (this.state.deltaClass) classes.push(this.state.deltaClass);
 
     return (
       <div
@@ -219,7 +219,9 @@ export class GoogleDataRT extends React.Component {
         <div className="widgetAnalytics_widgetRealTimeContainer">
           {
             this.props.config.options && this.props.config.options.title &&
-            <div className="widgetAnalytics_realTimeTitle">{this.props.config.options.title}</div>
+            <div className="widgetAnalytics_realTimeTitle">
+              {this.props.config.options.title}
+            </div>
           }
           <div className="widgetAnalytics_realTimeValue">
             {this.state.visualization}
@@ -227,14 +229,21 @@ export class GoogleDataRT extends React.Component {
         </div>
         {
           this.state.isLoading &&
-          <div className="widgetAnalytics_loader">{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
+          <div className="widgetAnalytics_loader">
+            {this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}
+          </div>
         }
         {
           this.state.isError &&
-          <div title={(this.props.errors) ? this.state.isError : ''} className="widgetAnalytics_errorContainer">
+          <div
+            title={(this.props.errors) ? this.state.isError : ''}
+            className="widgetAnalytics_errorContainer"
+          >
             {
               this.props.errors &&
-              <div className="widgetAnalytics_errorMsg">{this.state.isError}</div>
+              <div className="widgetAnalytics_errorMsg">
+                {this.state.isError}
+              </div>
             }
             {DEFAULT_ERROR}
           </div>
@@ -258,21 +267,19 @@ export class GoogleDataChart extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
 
-    // Prevent double execution on load
     if (JSON.stringify(this.props.views) !== JSON.stringify(prevProps.views)) {
-      this.updateView();
-    }
 
-    if (JSON.stringify(this.props.views) !== JSON.stringify(prevProps.views)) {
+      this.updateView();
 
       if (!prevState.isLoading) {
         let height = this.chartNode.clientHeight;
         this.chartNode.style.height = height + 'px';
-      } else {
+      } else if (!this.state.isLoading) {
         this.chartNode.style.height = '';
       }
 
     }
+
   };
 
   componentWillUnmount() {
@@ -334,14 +341,21 @@ export class GoogleDataChart extends React.Component {
         />
         {
           this.state.isLoading &&
-          <div className="widgetAnalytics_loader">{this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}</div>
+          <div className="widgetAnalytics_loader">
+            {this.props.loader !== undefined ? this.props.loader : DEFAULT_LOADING}
+          </div>
         }
         {
           this.state.isError &&
-          <div title={(this.props.errors) ? this.state.isError : ''} className="widgetAnalytics_errorContainer">
+          <div
+            title={(this.props.errors) ? this.state.isError : ''}
+            className="widgetAnalytics_errorContainer"
+          >
             {
               this.props.errors &&
-              <div className="widgetAnalytics_errorMsg">{this.state.isError}</div>
+              <div className="widgetAnalytics_errorMsg">
+                {this.state.isError}
+              </div>
             }
             {DEFAULT_ERROR}
           </div>

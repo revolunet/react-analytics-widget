@@ -139,8 +139,12 @@ const errors = true;
  * @returns {Component}
  */
  const customOutput = (realTimeData) => { 
+   
+  // console.log(realTimeData);
+
   return (
     <div className="my-custom-visualization">
+    // {}
     ...
     </div>
   ) 
