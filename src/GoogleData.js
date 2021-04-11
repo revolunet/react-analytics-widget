@@ -16,11 +16,10 @@ export class GoogleDataRT extends React.Component {
   state = {
     isError: false,
     isLoading: true,
-    rawValue: null,
     visualization: null,
     classVariation: null
   };
-
+  
   pausePolling = this.pausePolling.bind(this);
   resumePolling = this.resumePolling.bind(this);
   stopPolling = this.stopPolling.bind(this);
@@ -43,41 +42,20 @@ export class GoogleDataRT extends React.Component {
     this.loadData();
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
 
     // Prevent double execution on load
     if (JSON.stringify(this.props.views) !== JSON.stringify(prevProps.views)) {
       this.updateView();
     }
 
-    if (prevState.rawValue !== this.state.rawValue &&
-      prevState.classVariation === this.state.classVariation) {
-
-      // Only affects simple values (number count), not tables
-      if (typeof this.state.rawValue === 'number') {
-
-        const delta = this.state.rawValue - prevState.rawValue;
-        let timeout;
-
-        // Add CSS animation to visually show the when the counter goes up and down
-        const animationClass = delta > 0 ? "widgetAnalytics_isIncreasing" : "widgetAnalytics_isDecreasing";
-        this.setState({ classVariation: animationClass });
-
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          this.setState({ classVariation: null })
-        }, 3000);
-
-      }
-    }
-
   };
-
 
   componentWillUnmount() {
 
     this.realTime.off('success');
     this.realTime.off('error');
+    this.realTime.off('change');
 
     this.realTime.stop();
 
@@ -92,32 +70,36 @@ export class GoogleDataRT extends React.Component {
     };
 
     this.realTime = new gapi.analytics.ext.RealTime(config)
-      .on('success', ({ realTime }) => {
 
-        let rawValue;
+      .on('success', () => {
         this.setState({ isLoading: false });
+      })
 
-        // If the response has multiples columns
-        if (realTime.columnHeaders.length > 1) {
-
-          rawValue = JSON.stringify(realTime.rows);
-          // If values hasn't changed, do nothing
-          if (this.state.rawValue === rawValue) {
-            return;
-          }
-
-        } else {
-
-          rawValue = realTime.totalResults ? +realTime.rows[0][0] : 0;
-          // If values hasn't changed, do nothing
-          if (this.state.rawValue === rawValue) {
-            return;
-          }
-
-        }
+      .on('change', ({ realTime }) => {
 
         const visualization = this.dataToVisualization(realTime);
-        this.setState({ rawValue: rawValue, visualization: visualization });
+        const value = realTime.totalResults ? +realTime.rows[0][0] : 0;
+
+        let classVariation;
+
+        // Check if the response has multiples columns or only one
+        if ((realTime.columnHeaders.length === 1)) {
+
+          const delta = value - (this.lastValue | 0);
+         
+          // Add CSS animation to visually show the when the counter goes up and down
+          classVariation = delta > 0 ? "widgetAnalytics_isIncreasing" : "widgetAnalytics_isDecreasing";
+          
+          let timeout; 
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            this.setState({ classVariation: null })
+          }, 3000);
+
+          this.lastValue = value;
+        }
+
+        this.setState({ visualization, classVariation });
 
       })
 

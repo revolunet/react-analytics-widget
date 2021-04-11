@@ -42,7 +42,7 @@ export class GoogleProvider extends React.Component {
       gapi.analytics.createComponent('RealTime', {
 
         initialize: function () {
-          this.realTime = null;
+          this.realTime = { rows: [] };
           gapi.analytics.auth.once('signOut', this.handleSignOut_.bind(this));
         },
 
@@ -109,14 +109,25 @@ export class GoogleProvider extends React.Component {
 
               const result = await this.makeRequest_(options, pollingInterval);
 
-              if (result) {
-                this.realTime = result;
-                this.forcePause_ = false;
-                this.onSuccess_({ realTime: this.realTime });
-                return;
+              // If the values ​​changed
+              if (JSON.stringify(this.realTime.rows) !== JSON.stringify(result.rows)) {
+                this.onChange_({ realTime: result });
               }
 
+              this.onSuccess_({ realTime: result });
+              this.forcePause_ = false;
+              this.realTime = result;
+
+              return;
+
             } catch (err) {
+
+
+              // If the error has no body, isn't coming from the API
+              if (!err.hasOwnProperty('body')) {
+                this.stop();
+                return this.onError_({ error: err });
+              }
 
               // If an error happen, pause automatic interval pulling
               this.forcePause_ = true;
@@ -161,7 +172,7 @@ export class GoogleProvider extends React.Component {
             }
 
           }
-          
+
           this.onError_(errorBody);
 
         },
@@ -190,6 +201,10 @@ export class GoogleProvider extends React.Component {
 
         onSuccess_: function (data) {
           this.emit('success', data);
+        },
+
+        onChange_: function (data) {
+          this.emit('change', data);
         },
 
         onError_: function (err) {
