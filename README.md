@@ -7,7 +7,7 @@ Embed Google Analytics widgets in your React applications.
  - The `GoogleProvider` container ensure user is logged on analytics
  - The `GoogleDataChart` component display any [DataChart configuration](https://developers.google.com/analytics/devguides/reporting/embed/v1/component-reference#datachart)
  - The `GoogleDataRT` component display any [RealTime](https://developers.google.com/analytics/devguides/reporting/realtime/dimsmets/) data
- - The `css` component it's a basic style to allow a basic interface the interface.
+ - The `css` component is a minimal style to allows some basic functions in the interface.
 
 
 ![](./demo.png)
@@ -45,7 +45,7 @@ Also, add the Google SDK at the top of your page
 
 ## Usage
 ### Customizable props
-You can pass custom props to customize the visualizations.
+You can pass props to customize the visualizations.
 #### Data configuration
 ```js
 // Last 30 days analytics
@@ -100,6 +100,7 @@ const views = {
 #### Loader
 ```js
 // By default a css spinner is used
+// Set false to disable
 const loader = '<span>Loading...</span>';
 // ...
 <GoogleDataChart loader={loader} ... />
@@ -144,7 +145,6 @@ const errors = true;
 
   return (
     <div className="my-custom-visualization">
-    // {}
     ...
     </div>
   ) 

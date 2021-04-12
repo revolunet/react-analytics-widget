@@ -30,21 +30,6 @@ const CHARTS = [
   {
     query: {
       dimensions: "ga:date",
-      metrics: "ga:sessions",
-      "start-date": "30daysAgo",
-      "end-date": "yesterday"
-    },
-    chart: {
-      type: "LINE",
-      options: {
-        title: "Last 30 days sessions",
-        width: '100%'
-      }
-    }
-  },
-  {
-    query: {
-      dimensions: "ga:date",
       metrics: "ga:pageviews",
       "start-date": "30daysAgo",
       "end-date": "yesterday"
@@ -53,6 +38,22 @@ const CHARTS = [
       type: "LINE",
       options: {
         title: "Last 30 days pageviews",
+        width: '100%'
+      }
+    }
+  },
+  {
+    query: {
+      dimensions: "ga:browser",
+      metrics: "ga:sessions",
+      "start-date": "30daysAgo",
+      "end-date": "yesterday",
+      sort: '-ga:sessions'
+    },
+    chart: {
+      type: "PIE",
+      options: {
+        title: "Last 30 days sessions",
         width: '100%'
       }
     }
@@ -103,6 +104,7 @@ const REAL_TIME = [
     }
   }
 ]
+
 const customOutput = (realTimeData) => {
   return (
     <div>
