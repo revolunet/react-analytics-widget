@@ -245,15 +245,33 @@ const views = {
 };
 
 class Example extends Component {
+  
   componentDidMount = () => {
-    const request = new Request('https://yourserver.example/auth/ganalytics/getToken', {
-      method: 'GET'
-    });
-    fetch(request)
-      .then(response => response.json())
-      .then(({ token }) => {
-        this.setState({ token }); // TODO: handle errors
-      });
+
+    const getToken = async () => {
+
+      try {
+        const request = new Request('https://yourserver.example/auth/ganalytics/getToken', {
+          method: 'GET'
+        });
+    
+        let response = await fetch(request);
+        const { token } = await response.json(); 
+
+        if (!token) throw new Error ('Token not found');
+
+        this.setState({ token });
+    
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    getToken();
+
+    // The tokens expires every 60 minutos, so refresh every 50
+    setInterval(() => getToken(), 1000 * 60 * 50);
+
   };
 
   render = () => (

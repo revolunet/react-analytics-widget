@@ -108,7 +108,7 @@ const REAL_TIME = [
 const customOutput = (realTimeData) => {
   return (
     <div>
-      <pre>{(realTimeData.columnHeaders) ? JSON.stringify(realTimeData.columnHeaders,  undefined, 2) : 'No results'}</pre>
+      <pre>{(realTimeData.columnHeaders) ? JSON.stringify(realTimeData.columnHeaders, undefined, 2) : 'No results'}</pre>
       <pre>{(realTimeData.rows) ? JSON.stringify(realTimeData.rows, undefined, 2) : 'No results'}</pre>
     </div>
   )
@@ -120,19 +120,33 @@ class Example extends React.Component {
     ids: "ga:210653791"
   }
 
-  componentDidMount = () => {
-    const request = new Request('http://localhost/api/google_auth', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    fetch(request)
-      .then(response => response.json())
-      .then(({ token }) => {
-        this.setState({ token }); // TODO: handle errors
-      })
-      .catch(err => {
+  async componentDidMount() {
+
+    const getToken = async () => {
+
+      try {
+        const request = new Request('http://localhost/api/google_auth', {
+          method: 'GET',
+          credentials: 'include'
+        });
+    
+        let response = await fetch(request);
+        const { token } = await response.json(); 
+
+        if (!token) throw new Error ('Token not found');
+
+        this.setState({ token });
+    
+      } catch (err) {
         console.error(err)
-      })
+      }
+    }
+
+    getToken();
+
+    // The tokens expires every 60 minutes, so refresh every 50?
+    setInterval(() => getToken(), 1000 * 60 * 50);
+
   }
 
   render() {

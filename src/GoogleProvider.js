@@ -14,7 +14,21 @@ export class GoogleProvider extends React.Component {
   componentDidMount() {
     this.init();
   }
-  init = () => {
+
+  componentDidUpdate(prevProps) {
+    // If the token has changed
+    if (
+      this.state.ready &&
+      this.props.accessToken !== prevProps.accessToken
+    ) {
+      gapi.auth.setToken({
+        access_token: this.props.accessToken
+      })
+    }
+  }
+
+  init() {
+
     const doAuth = () => {
       const authObj = this.props.accessToken ?
         { serverAuth: { access_token: this.props.accessToken } } :
@@ -26,7 +40,7 @@ export class GoogleProvider extends React.Component {
         });
     };
 
-    const realTimeController = () => {
+    const addRealTimeController = () => {
 
       /**
        * This code is an adaptation from one made by Google, available here:
@@ -226,7 +240,7 @@ export class GoogleProvider extends React.Component {
     gapi.analytics.ready(() => {
 
       if (!isLoadedRealTimeController) {
-        realTimeController();
+        addRealTimeController();
         this.setState({
           readyRealTime: true
         });
@@ -240,7 +254,7 @@ export class GoogleProvider extends React.Component {
       }
       const authResponse = gapi.analytics.auth.getAuthResponse();
       if (!authResponse) {
-        gapi.analytics.auth.on("success", _ => {
+        gapi.analytics.auth.on("signIn", _ => {
           this.setState({
             ready: true
           });

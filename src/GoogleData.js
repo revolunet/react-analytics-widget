@@ -72,7 +72,7 @@ export class GoogleDataRT extends React.Component {
     this.realTime = new gapi.analytics.ext.RealTime(config)
 
       .on('success', () => {
-        this.setState({ isLoading: false });
+        this.setState({ isLoading: false, isError: false });
       })
 
       .on('change', ({ realTime }) => {
@@ -103,7 +103,7 @@ export class GoogleDataRT extends React.Component {
 
       })
 
-      .on('error', ({ error }) => {
+      .on('error', async ({ error }) => {
         this.setState({
           isError: error.message,
           isLoading: false
@@ -114,6 +114,7 @@ export class GoogleDataRT extends React.Component {
 
     window.addEventListener('blur', this.pausePolling, false);
     window.addEventListener('focus', this.resumePolling, false);
+
 
   };
 
@@ -261,6 +262,16 @@ export class GoogleDataChart extends React.Component {
     isError: null
   };
 
+  refreshChart = this.refreshChart.bind(this);
+
+  refreshChart() {
+    if (this.res) { clearTimeout(this.res) };
+    // Timeout to prevent multiples fires
+    this.res = setTimeout(() => {
+      this.chart.execute();
+    }, 100);
+  }
+
   componentDidMount() {
     this.loadChart();
   };
@@ -285,6 +296,9 @@ export class GoogleDataChart extends React.Component {
   componentWillUnmount() {
     this.chart.off('success');
     this.chart.off('error');
+
+    window.removeEventListener('resize', this.refreshChart);
+
   };
 
   loadChart = () => {
@@ -300,16 +314,19 @@ export class GoogleDataChart extends React.Component {
     this.chart = new gapi.analytics.googleCharts.DataChart(config)
       .on('success', () => {
         this.setState({
-          isError: null,
+          isError: false,
           isLoading: false
         });
       })
-      .on('error', ({ error }) => {
+      .on('error', async ({ error }) => { 
         this.setState({
           isError: error.message,
           isLoading: false
         })
       })
+
+    // Responsive Google Charts
+    window.addEventListener('resize', this.refreshChart);
 
     this.updateView();
 
