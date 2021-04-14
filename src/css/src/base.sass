@@ -1,0 +1,197 @@
+$base-color: rgb(5, 141, 199)
+$decreasing-color: rgba(255, 0, 0, 0.849)
+$increasing-color: rgba(0, 218, 0, 0.788)
+
+.widgetAnalytics_widget
+  font-family: Arial, Helvetica, sans-serif
+
+.widgetAnalytics_widgetChart
+  min-height: 100px
+  min-width: 100px
+
+.widgetAnalytics_widgetRealTime
+  min-width: 90px
+  min-height: 35px
+  font-size: 13px
+
+  .widgetAnalytics_realTimeValue
+    font-weight: 300
+
+    .widgetAnalytics_realTimeValueNumber
+      font-size: 30px
+      position: relative
+
+  .widgetAnalytics_realTimeTitle
+    text-align: left
+    font-size: 16px
+    margin: 0px 0 10px
+
+  .widgetAnalytics_realTimeTable
+    border-radius: 5px
+    border-collapse: collapse
+    width: 100%
+
+    td, th
+      border: 1px solid #ddd
+      padding: 8px
+
+    tr:nth-child(even)
+      background-color: #f2f2f2
+
+    th
+      padding-top: 12px
+      padding-bottom: 12px
+      text-align: left
+      background-color: $base-color
+      color: white
+
+.widgetAnalytics_arrow
+  display: none
+  margin-left: 8px
+  width: 0
+  height: 0
+  border-left: 10px solid transparent
+  border-right: 10px solid transparent
+  position: absolute
+
+.widgetAnalytics_isIncreasing
+  .widgetAnalytics_arrow
+    top: 8px
+    animation: in 4.5s
+    display: inline
+
+.widgetAnalytics_isDecreasing
+  .widgetAnalytics_arrow
+    top: 13px
+    animation: de 4.5s
+    display: inline
+
+@keyframes in
+  0%
+    border-bottom: 10px solid transparent
+
+  20%
+    border-bottom: 10px solid $increasing-color
+
+  90%
+    border-bottom: 10px solid $increasing-color
+
+  100%
+    border-bottom: 10px solid transparent
+
+@keyframes de
+  0%
+    border-top: 10px solid transparent
+
+  20%
+    border-top: 10px solid $decreasing-color
+
+  90%
+    border-top: 10px solid $decreasing-color
+
+  100%
+    border-top: 10px solid transparent
+
+.widgetAnalytics_onLoading
+  .widgetAnalytics_widgetChartContainer, .widgetAnalytics_widgetRealTimeContainer
+    visibility: hidden
+
+.widgetAnalytics_onError
+  .widgetAnalytics_widgetChartContainer, .widgetAnalytics_widgetRealTimeContainer
+    visibility: hidden
+
+  background: #f6f6f6
+
+.widgetAnalytics_errorContainer
+  left: 0
+  right: 0
+  top: 0
+  bottom: 0
+  position: absolute
+  font-size: 13px
+  align-items: center
+  display: flex
+  justify-content: center
+  color: #777777
+  overflow: hidden
+
+  .widgetAnalytics_errorMsg
+    width: 80%
+    margin-top: 70px
+    text-overflow: ellipsis
+    white-space: pre-wrap
+    overflow: hidden
+    font-size: 12px
+    text-align: center
+
+  .widgetAnalytics_errorCircle
+    user-select: none
+    cursor: default
+    width: 25px
+    height: 25px
+    line-height: 25px
+    background: #c7c7c7
+    border-radius: 50%
+    color: #fff
+    font-size: 11px
+    font-family: verdana
+    text-align: center
+    left: 0
+    right: 0
+    bottom: 0
+    top: 0
+    margin: auto
+    position: absolute
+
+.widgetAnalytics_loader
+  left: 0
+  right: 0
+  top: 50%
+  transform: translateY(-50%)
+  position: absolute
+  text-align: center
+  color: #000
+  font-family: sans-serif
+  font-size: 13px 
+
+  .widgetAnalytics_loaderSpinner
+    border-radius: 50%
+    width: 2.1em
+    height: 2.1em
+
+    &:after
+      border-radius: 50%
+      width: 2.1em
+      height: 2.1em
+
+    margin: auto
+    font-size: 9px
+    position: relative
+    text-indent: -9999em
+    border-top: 1em solid rgba(255, 255, 255, 0.2)
+    border-right: 1em solid rgba(255, 255, 255, 0.2)
+    border-bottom: 1em solid rgba(255, 255, 255, 0.2)
+    border-left: 1em solid $base-color
+    -webkit-transform: translateZ(0)
+    -ms-transform: translateZ(0)
+    transform: translateZ(0)
+    -webkit-animation: load8 0.5s infinite linear
+    animation: load8 0.5s infinite linear
+
+  @-webkit-keyframes load8
+    0%
+      -webkit-transform: rotate(0deg)
+      transform: rotate(0deg)
+
+    100%
+      -webkit-transform: rotate(360deg)
+      transform: rotate(360deg)
+
+  @keyframes load8
+    0%
+      -webkit-transform: rotate(0deg)
+      transform: rotate(0deg)
+
+    100%
+      -webkit-transform: rotate(360deg)
+      transform: rotate(360deg)

@@ -1,3 +1,2 @@
-export * from "./GoogleProvider";
-export * from "./GoogleData";
-export { css } from "./styles/style.css";
+export { GoogleProvider } from "./GoogleProvider";
+export { GoogleDataChart, GoogleDataRT } from "./GoogleData";

@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/style.css';
+import './css/base.css';
 
 const DEFAULT_LOADING = <div className="widgetAnalytics_loaderSpinner"></div>
 const DEFAULT_ERROR = <div className="widgetAnalytics_errorCircle"><div>X</div></div>
