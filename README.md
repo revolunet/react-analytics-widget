@@ -66,11 +66,11 @@ const last30days = {
   }
 };
 
-// Realtime users
+// Active users in real time
 const activeUsers = {
   pollingInterval: 5, // 5 seconds minimum
   options: {
-    title: 'Realtime users'
+    title: 'Active users'
   },
   query: {
     metrics: 'rt:activeUsers'
@@ -99,7 +99,7 @@ const views = {
 
 #### Loader
 ```js
-// By default a css spinner is used
+// By default a css spinner is displayed
 // Set false to disable
 const loader = '<span>Loading...</span>';
 // ...
@@ -110,7 +110,8 @@ const loader = '<span>Loading...</span>';
 
 #### Errors
 ```js
-// By default the errors are hidden (quota, bad view id, insufficient permissions, missing or wrong parameters, etc)
+// By default the errors are hidden (quota, bad view id,
+// insufficient permissions, missing or wrong parameters, etc)
 // ...
 const errors = true;
 <GoogleDataRT errors={errors} ... />
@@ -120,12 +121,18 @@ const errors = true;
 #### Custom output (only in GoogleDataRT)
 ```js
 /**
- * RealTime data is not supported by the official DataChart api,
- * so we have to make custom visualizations. These values
- * can be returned as an unique number (a total count)
- * or as multiples columns (dimensions) that can been displayed as tables or charts.
- * By default the data is visualizated as a number or a table in each case,
- * but you can customize the api's response visualization using this prop.
+ * RealTime data is not supported by the official DataChart Analytics API,
+ * so we have to make custom our visualizations.
+ * 
+ * The values returned by the api can be a unique total number (active users),
+ * or multiples columns (active users by browser) that must be displayed as
+ * a table or chart.
+ * 
+ * By default the data is displayed simply as a number (or a table, depending
+ * on each case), but you can customize the output using this prop.
+ * 
+ * Even, if you want, you can configure to use Google Charts:
+ * (https://developers.google.com/chart/interactive/docs/quick_start)
  * 
  * @param {object} realTimeData Google Api response
  * @param {array}  realTimeData.columnHeaders Name of the columns returned
@@ -137,12 +144,11 @@ const errors = true;
  * @param {string} realTimeData.selfLink
  * @param {number} realTimeData.totalResults Total count
  * @param {object} realTimeData.totalsForAllResults
+ * @param {none} node Widget container
  * @returns {Component}
  */
- const customOutput = (realTimeData) => { 
-   
+ const customOutput = (realTimeData, node) => { 
   // console.log(realTimeData);
-
   return (
     <div className="my-custom-visualization">
     ...
@@ -245,7 +251,7 @@ const views = {
 };
 
 class Example extends Component {
-  
+
   componentDidMount = () => {
 
     const getToken = async () => {

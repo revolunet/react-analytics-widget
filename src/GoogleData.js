@@ -150,7 +150,7 @@ export class GoogleDataRT extends React.Component {
 
     // Check if the customOutput prop exists
     if (this.props.customOutput) {
-      return this.props.customOutput(realTimeData);
+      return this.props.customOutput(realTimeData, this.RTNode);
     }
 
     // Simple result
@@ -217,7 +217,10 @@ export class GoogleDataRT extends React.Component {
         className={classes.join(' ')}
         style={{ ...this.props.style, position: 'relative' }}
       >
-        <div className="widgetAnalytics_widgetRealTimeContainer">
+        <div
+          className="widgetAnalytics_widgetRealTimeContainer"
+          ref={node => (this.RTNode = node)}
+        >
           {
             this.props.config.options && this.props.config.options.title &&
             <div className="widgetAnalytics_realTimeTitle">
@@ -318,7 +321,7 @@ export class GoogleDataChart extends React.Component {
           isLoading: false
         });
       })
-      .on('error', async ({ error }) => { 
+      .on('error', async ({ error }) => {
         this.setState({
           isError: error.message,
           isLoading: false
