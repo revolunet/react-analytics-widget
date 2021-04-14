@@ -1,6 +1,6 @@
 $base-color: rgb(5, 141, 199)
-$decreasing-color: rgba(255, 0, 0, 0.5)
-$increasing-color: rgba(0, 128, 0, 0.5)
+$decreasing-color: rgba(255, 0, 0, 0.849)
+$increasing-color: rgba(0, 218, 0, 0.788)
 
 .widgetAnalytics_widget
   font-family: Arial, Helvetica, sans-serif
@@ -19,6 +19,7 @@ $increasing-color: rgba(0, 128, 0, 0.5)
 
     .widgetAnalytics_realTimeValueNumber
       font-size: 30px
+      position: relative
 
   .widgetAnalytics_realTimeTitle
     text-align: left
@@ -44,33 +45,52 @@ $increasing-color: rgba(0, 128, 0, 0.5)
       background-color: $base-color
       color: white
 
+.widgetAnalytics_arrow
+  display: none
+  margin-left: 8px
+  width: 0
+  height: 0
+  border-left: 10px solid transparent
+  border-right: 10px solid transparent
+  position: absolute
+
 .widgetAnalytics_isIncreasing
-  -webkit-animation: a 3s
-  animation: a 3s
+  .widgetAnalytics_arrow
+    top: 8px
+    animation: in 4.5s
+    display: inline
 
 .widgetAnalytics_isDecreasing
-  -webkit-animation: b 3s 
-  animation: b 3s
+  .widgetAnalytics_arrow
+    top: 13px
+    animation: de 4.5s
+    display: inline
 
-@-webkit-keyframes a
-  10%
-    background-color: $increasing-color
-    color: #fff
+@keyframes in
+  0%
+    border-bottom: 10px solid transparent
 
-@keyframes a
-  10%
-    background-color: $increasing-color
-    color: #fff
+  20%
+    border-bottom: 10px solid $increasing-color
 
-@-webkit-keyframes b
-  10%
-    background-color: $decreasing-color
-    color: #fff
+  90%
+    border-bottom: 10px solid $increasing-color
 
-@keyframes b
-  10%
-    background-color: $decreasing-color
-    color: #fff
+  100%
+    border-bottom: 10px solid transparent
+
+@keyframes de
+  0%
+    border-top: 10px solid transparent
+
+  20%
+    border-top: 10px solid $decreasing-color
+
+  90%
+    border-top: 10px solid $decreasing-color
+
+  100%
+    border-top: 10px solid transparent
 
 .widgetAnalytics_onLoading
   .widgetAnalytics_widgetChartContainer, .widgetAnalytics_widgetRealTimeContainer

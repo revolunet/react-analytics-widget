@@ -94,7 +94,7 @@ export class GoogleDataRT extends React.Component {
           clearTimeout(timeout);
           timeout = setTimeout(() => {
             this.setState({ deltaClass: null })
-          }, 3000);
+          }, 4800);
 
           this.lastValue = value;
         }
@@ -158,7 +158,10 @@ export class GoogleDataRT extends React.Component {
 
       const count = realTimeData.totalResults ? +realTimeData.rows[0][0] : 0 + 0;
       return (
-        <span className="widgetAnalytics_realTimeValueNumber">{count}</span>
+        <span className="widgetAnalytics_realTimeValueNumber">
+          {count}
+          <span class="widgetAnalytics_arrow"></span>
+        </span>
       )
 
       // Complex result
