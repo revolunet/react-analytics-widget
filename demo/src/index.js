@@ -105,7 +105,7 @@ const REAL_TIME = [
   }
 ]
 
-const customOutput = (realTimeData) => {
+const customOutput = (realTimeData, node) => {
   return (
     <div>
       <pre>{(realTimeData.columnHeaders) ? JSON.stringify(realTimeData.columnHeaders, undefined, 2) : 'No results'}</pre>

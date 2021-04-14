@@ -144,7 +144,7 @@ const errors = true;
  * @param {string} realTimeData.selfLink
  * @param {number} realTimeData.totalResults Total count
  * @param {object} realTimeData.totalsForAllResults
- * @param {none} node Widget container
+ * @param {HTMLElement} node Widget container
  * @returns {Component}
  */
  const customOutput = (realTimeData, node) => { 
