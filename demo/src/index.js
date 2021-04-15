@@ -129,14 +129,14 @@ class Example extends React.Component {
           method: 'GET',
           credentials: 'include'
         });
-    
-        let response = await fetch(request);
-        const { token } = await response.json(); 
 
-        if (!token) throw new Error ('Token not found');
+        let response = await fetch(request);
+        const { token } = await response.json();
+
+        if (!token) throw new Error('Token not found');
 
         this.setState({ token });
-    
+
       } catch (err) {
         console.error(err)
       }
@@ -144,9 +144,13 @@ class Example extends React.Component {
 
     getToken();
 
-    // The tokens expires every 60 minutes, so refresh every 50?
-    setInterval(() => getToken(), 1000 * 60 * 50);
+    // The tokens expires every 60 minutes, so refresh every 50
+    this.interval = setInterval(() => getToken(), 1000 * 60 * 50);
 
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {

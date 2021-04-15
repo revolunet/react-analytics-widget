@@ -57,9 +57,9 @@
   0% {
     border-bottom: 10px solid transparent; }
   20% {
-    border-bottom: 10px solid rgba(0, 218, 0, 0.788); }
+    border-bottom: 10px solid rgba(0, 218, 0, 0.65); }
   90% {
-    border-bottom: 10px solid rgba(0, 218, 0, 0.788); }
+    border-bottom: 10px solid rgba(0, 218, 0, 0.65); }
   100% {
     border-bottom: 10px solid transparent; } }
 
@@ -67,9 +67,9 @@
   0% {
     border-top: 10px solid transparent; }
   20% {
-    border-top: 10px solid rgba(255, 0, 0, 0.849); }
+    border-top: 10px solid rgba(255, 0, 0, 0.65); }
   90% {
-    border-top: 10px solid rgba(255, 0, 0, 0.849); }
+    border-top: 10px solid rgba(255, 0, 0, 0.65); }
   100% {
     border-top: 10px solid transparent; } }
 
