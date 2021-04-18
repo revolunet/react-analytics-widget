@@ -3,44 +3,69 @@ import PropTypes from 'prop-types';
 
 // dont wait for auth twice, even after unmounts
 let isLoaded = false;
-let isLoadedRealTimeController = false;
 
-// wait for auth to display children
+// Save the button for later. Workaround for API limitation that render
+// the auth button only once per page load.
+let authButton = null;
+
+// wait for auth and refeshed token (if needed) to display children
 export class GoogleProvider extends React.Component {
   state = {
     ready: false,
-    readyRealTime: false
+    needsNewToken: false
   };
+
   componentDidMount() {
     this.init();
+  };
+
+  componentWillUnmount() {
+    gapi.analytics.auth.off();
   }
 
   componentDidUpdate(prevProps) {
-    // If the token has changed
-    if (
-      this.state.ready &&
-      this.props.accessToken !== prevProps.accessToken
+    // The token may have to be refreshed because the parent element changed its state (by an interval?),
+    // or because this component was remounted.
+    if (this.state.ready &&
+      (prevProps.accessToken !== this.props.accessToken || this.state.needsNewToken)
     ) {
       gapi.auth.setToken({
         access_token: this.props.accessToken
       })
+      this.setState({
+        needsNewToken: false
+      });
     }
-  }
+  };
 
   init() {
 
     const doAuth = () => {
+
       const authObj = this.props.accessToken ?
         { serverAuth: { access_token: this.props.accessToken } } :
         { clientid: this.props.clientId };
+
       gapi.analytics.auth &&
         gapi.analytics.auth.authorize({
+          userInfoLabel: this.props.userInfoLabel,
           ...authObj,
           container: this.authButtonNode
         });
+
+      gapi.analytics.auth.once('needsAuthorization', () => {
+        // Api limitation render the button once per page load
+        // So we store it for later
+        authButton = this.authButtonNode;
+      })
+
+      gapi.analytics.auth.once('error', (err) => {
+        console.error(err);
+      })
+
     };
 
-    const addRealTimeController = () => {
+    const addRealTimeSupport = () => {
 
       /**
        * This code is an adaptation from one made by Google, available here:
@@ -136,7 +161,6 @@ export class GoogleProvider extends React.Component {
 
             } catch (err) {
 
-
               // If the error has no body, isn't coming from the API
               if (!err.hasOwnProperty('body')) {
                 this.stop();
@@ -187,6 +211,7 @@ export class GoogleProvider extends React.Component {
 
           }
 
+          this.stop();
           this.onError_(errorBody);
 
         },
@@ -239,39 +264,48 @@ export class GoogleProvider extends React.Component {
 
     gapi.analytics.ready(() => {
 
-      if (!isLoadedRealTimeController) {
-        addRealTimeController();
-        this.setState({
-          readyRealTime: true
-        });
+      // If the library is loaded (and was unmounted), so refesh the token 
+      if (isLoaded) {
+
+        if (this.props.accessToken) {
+          this.setState({
+            needsNewToken: true
+          });
+        }
+
+        // If exists, append the stored auth button
+        if (authButton && !this.state.ready) {
+          this.authButtonNode.appendChild(authButton)
+        }
+
+      } else {
+        // Run this only once, even is unmounted
+        addRealTimeSupport();
+        doAuth();
       }
 
-      if (isLoaded) {
+      const isAuthorized = gapi.analytics.auth.isAuthorized();
+
+      if (isAuthorized) {
         this.setState({
           ready: true
         });
-        return;
-      }
-      const authResponse = gapi.analytics.auth.getAuthResponse();
-      if (!authResponse) {
+      } else {
         gapi.analytics.auth.on("signIn", _ => {
           this.setState({
             ready: true
           });
         });
-      } else {
-        this.setState({
-          ready: true
-        });
       }
-      doAuth();
+      isLoaded = true;
     });
   };
+
   render() {
     return (
       <div>
         {this.props.clientId && <div ref={node => (this.authButtonNode = node)} />}
-        {this.state.ready && this.props.children}
+        {(this.state.ready && !this.state.needsNewToken) && this.props.children}
       </div>
     );
   }

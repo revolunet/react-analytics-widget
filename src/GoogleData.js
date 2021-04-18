@@ -53,10 +53,7 @@ export class GoogleDataRT extends React.Component {
 
   componentWillUnmount() {
 
-    this.realTime.off('success');
-    this.realTime.off('error');
-    this.realTime.off('change');
-
+    this.realTime.off();
     this.realTime.stop();
 
     window.removeEventListener('blur', this.pausePolling, false);
@@ -160,7 +157,7 @@ export class GoogleDataRT extends React.Component {
       return (
         <span className="widgetAnalytics_realTimeValueNumber">
           {count}
-          <span class="widgetAnalytics_arrow"></span>
+          <span className="widgetAnalytics_arrow"></span>
         </span>
       )
 
@@ -300,11 +297,8 @@ export class GoogleDataChart extends React.Component {
   };
 
   componentWillUnmount() {
-    this.chart.off('success');
-    this.chart.off('error');
-
+    this.chart.off();
     window.removeEventListener('resize', this.refreshChart);
-
   };
 
   loadChart = () => {

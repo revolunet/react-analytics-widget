@@ -160,6 +160,16 @@ const errors = true;
 // ...
 ```
 
+#### UserInfoLabel
+```js
+// If you are using OAUTH client id, this is the text to display before a logged in
+// user's email address. Defaults to 'You are logged in as: '.
+// ...
+const userInfoLabel = 'Has iniciado sesión como: ';
+<GoogleProvider userInfoLabel={userInfoLabel} ... />
+// ...
+```
+
 ### CSS
 The css component is a minimal style to allows some basic functions in the interface.
 
@@ -290,10 +300,13 @@ class Example extends Component {
   };
 
   render = () => (
-    <GoogleProvider accessToken={this.state.token}>
-      <GoogleDataChart views={views} config={last7days} />
-      <GoogleDataRT views={views} config={realTimeBrowsers} />
-    </GoogleProvider>
+      
+    (this.state.token) &&
+      <GoogleProvider accessToken={this.state.token}>
+        <GoogleDataChart views={views} config={last7days} />
+        <GoogleDataRT views={views} config={realTimeBrowsers} />
+      </GoogleProvider>
+            
   )
 };
 ```
