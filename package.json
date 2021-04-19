@@ -19,19 +19,19 @@
     "umd"
   ],
   "scripts": {
-    "build": "npm-run-all build-css build-js && ncp src/css css",
-    "build-js": "nwb build-react-component",
+    "build": "npm-run-all sass:build build:nwb && ncp src/css css",
+    "build:nwb": "nwb build-react-component",
     "clean": "nwb clean-module && nwb clean-demo && nwb clean-css",
-    "start": "npm-run-all -p watch-css start-js",
-    "start-js": "nwb serve-react-demo",
-    "start-token": "npm-run-all -p watch-css start-token-js",
-    "start-token-js": "nwb serve-react-app demo/src/index_token.js",
+    "start": "npm-run-all -p sass:watch start:nwb",
+    "start:nwb": "nwb serve-react-demo",
+    "start:token-demo": "npm-run-all -p sass:watch start:token-demo:nwb",
+    "start:token-demo:nwb": "nwb serve-react-app demo/src/index_token.js",
     "test": "nwb test-react",
     "publish": "gh-pages -d demo/dist && git push",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
-    "build-css": "node-sass-chokidar src/css/src -o src/css ",
-    "watch-css": "npm run build-css && node-sass-chokidar src/css/src -o src/css --watch --recursive --use-polling --polling-interval 1000"
+    "sass:build": "node-sass-chokidar src/css/src -o src/css ",
+    "sass:watch": "npm run sass:build && node-sass-chokidar src/css/src -o src/css --watch --recursive --use-polling --polling-interval 1000"
   },
   "peerDependencies": {
     "react": "15.x"
