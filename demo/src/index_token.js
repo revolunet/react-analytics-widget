@@ -5,12 +5,12 @@ import GithubCorner from 'react-github-corner';
 import { GoogleProvider, GoogleDataChart, GoogleDataRT } from "../../src";
 import "../../css/base.css";
 
-; (function (w, d, s, g, js, fs) {
-  g = w.gapi || (w.gapi = {}); g.analytics = { q: [], ready: function (f) { this.q.push(f); } };
-  js = d.createElement(s); fs = d.getElementsByTagName(s)[0];
-  js.src = 'https://apis.google.com/js/platform.js';
-  fs.parentNode.insertBefore(js, fs); js.onload = function () { g.load('analytics'); };
-}(window, document, 'script'));
+  ; (function (w, d, s, g, js, fs) {
+    g = w.gapi || (w.gapi = {}); g.analytics = { q: [], ready: function (f) { this.q.push(f); } };
+    js = d.createElement(s); fs = d.getElementsByTagName(s)[0];
+    js.src = 'https://apis.google.com/js/platform.js';
+    fs.parentNode.insertBefore(js, fs); js.onload = function () { g.load('analytics'); };
+  }(window, document, 'script'));
 
 const CHARTS = [
   {
@@ -115,12 +115,42 @@ const customOutput = (realTimeData, node) => {
   )
 }
 
-// App credential in the google developer console
-var CLIENT_ID = "960315238073-dv345fcj3tkikn506k9lrch73hk9259u.apps.googleusercontent.com"
-
 class Example extends React.Component {
   state = {
-    ids: "ga:150278027"
+    ids: "ga:210653791"
+  }
+
+  async componentDidMount() {
+
+    const getToken = async () => {
+
+      try {
+        const request = new Request('http://localhost/api/google_auth', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        let response = await fetch(request);
+        const { token } = await response.json();
+
+        if (!token) throw new Error('Token not found');
+
+        this.setState({ token });
+
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    getToken();
+
+    // The tokens expires every 60 minutes, so refresh every 50
+    this.interval = setInterval(() => getToken(), 1000 * 60 * 50);
+
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {
@@ -132,7 +162,9 @@ class Example extends React.Component {
     return (
       <div>
         <GithubCorner href="https://github.com/revolunet/react-analytics-widget" />
-          <GoogleProvider clientId={CLIENT_ID}>
+        {
+          (this.state.token) &&
+          <GoogleProvider accessToken={this.state.token}>
             <div style={{ margin: '20px 0' }}>
               Define your view ID :
             <input type="text" onChange={e => this.setState({ ids: e.target.value })} value={this.state.ids} />
@@ -148,9 +180,10 @@ class Example extends React.Component {
               <GoogleDataRT customOutput={customOutput} style={{ backgroundColor: '#f8f8f8', width: 250, overflow: 'hidden', wordBreak: 'break-all', verticalAlign: 'top', display: 'inline-block', margin: 20, border: '1px solid #eee', padding: 10 }} views={views} config={REAL_TIME[2]} errors={true} />
             </div>
           </GoogleProvider>
+        }
       </div>
     )
   }
 }
 
-render(<Example />, document.getElementById("demo"))
+render(<Example />, document.getElementById("app"))
