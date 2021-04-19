@@ -125,11 +125,15 @@ export class GoogleDataRT extends React.Component {
   };
 
   /**
-   * Creates a simple table to show results with multiples columns (dimensions),
-   * or show the value as an unique number (Ex: Actives users: 10)
+   * RealTime data is not supported by the official DataChart Analytics API,
+   * so we have to make custom visualizations.
    * 
-   * This function can be overwritten passing a 'customOutput' prop,
-   * and used that to display custom charts or tables.
+   * The values returned by the api can be a unique total number (active users),
+   * or multiples values/columns (activeUsers by browser, for example) that must be displayed as
+   * a table or chart.
+   * 
+   * By default the data is displayed simply as a number (or a table, depending
+   * on each case).
    * 
    * @param {object} realTimeData Google Api response
    * @param {array}  realTimeData.columnHeaders Name of the columns returned
@@ -137,7 +141,7 @@ export class GoogleDataRT extends React.Component {
    * @param {string} realTimeData.kind
    * @param {object} realTimeData.profileInfo
    * @param {string} realTimeData.query
-   * @param {array}  [realTimeData.rows] Rows if there is results
+   * @param {array}  [realTimeData.rows] Rows if there are results
    * @param {string} realTimeData.selfLink
    * @param {number} realTimeData.totalResults Total count
    * @param {object} realTimeData.totalsForAllResults

@@ -122,10 +122,10 @@ const errors = true;
 ```js
 /**
  * RealTime data is not supported by the official DataChart Analytics API,
- * so we have to make custom our visualizations.
+ * so we have to make custom visualizations.
  * 
  * The values returned by the api can be a unique total number (active users),
- * or multiples columns (active users by browser) that must be displayed as
+ * or multiples values/columns (activeUsers by browser, for example) that must be displayed as
  * a table or chart.
  * 
  * By default the data is displayed simply as a number (or a table, depending
@@ -140,7 +140,7 @@ const errors = true;
  * @param {string} realTimeData.kind
  * @param {object} realTimeData.profileInfo
  * @param {string} realTimeData.query
- * @param {array}  [realTimeData.rows] Rows if there is results
+ * @param {array}  [realTimeData.rows] Rows if there are results
  * @param {string} realTimeData.selfLink
  * @param {number} realTimeData.totalResults Total count
  * @param {object} realTimeData.totalsForAllResults
@@ -162,7 +162,7 @@ const errors = true;
 
 #### UserInfoLabel
 ```js
-// If you are using OAUTH client id, this is the text to display before a logged in
+// If you are using OAUTH client id, this is the text to display before the logged in
 // user's email address. Defaults to 'You are logged in as: '.
 // ...
 const userInfoLabel = 'Has iniciado sesión como: ';
@@ -237,7 +237,7 @@ const Example = () => (
 
 ```js
 import React, { Component } from 'react';
-import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget'
+import { GoogleProvider, GoogleDataChart, GoogleDataRT } from 'react-analytics-widget';
 import 'react-analytics-widget/css/base.css';
 
 // graph 1 config
