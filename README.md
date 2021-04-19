@@ -175,6 +175,9 @@ The css component is a minimal style to allows some basic functions in the inter
 
 ```js
 import 'react-analytics-widget/css/base.css';
+// or
+import 'react-analytics-widget/css/src/base.sass';
+
 ```
 
 ### OAUTH authentication

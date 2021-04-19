@@ -24,6 +24,8 @@
     "clean": "nwb clean-module && nwb clean-demo && nwb clean-css",
     "start": "npm-run-all -p watch-css start-js",
     "start-js": "nwb serve-react-demo",
+    "start-token": "npm-run-all -p watch-css start-token-js",
+    "start-token-js": "nwb serve-react-app demo/src/index_token.js",
     "test": "nwb test-react",
     "publish": "gh-pages -d demo/dist && git push",
     "test:coverage": "nwb test-react --coverage",
