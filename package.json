@@ -12,29 +12,35 @@
   "bugs": {
     "url": "https://github.com/revolunet/react-analytics-widget/issues"
   },
-  "files": [
-    "css",
-    "es",
-    "lib",
-    "umd"
-  ],
   "scripts": {
-    "build": "nwb build-react-component",
-    "clean": "nwb clean-module && nwb clean-demo",
-    "start": "nwb serve-react-demo",
+    "build": "npm-run-all sass:build build:nwb && ncp src/css css",
+    "build:nwb": "nwb build-react-component",
+    "clean": "nwb clean-module && nwb clean-demo && nwb clean-css",
+    "start": "npm-run-all -p sass:watch start:nwb",
+    "start:nwb": "nwb serve-react-demo",
+    "start:token-demo": "npm-run-all -p sass:watch start:token-demo:nwb",
+    "start:token-demo:nwb": "nwb serve-react-app demo/src/index_token.js",
     "test": "nwb test-react",
     "publish": "gh-pages -d demo/dist && git push",
     "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server"
+    "test:watch": "nwb test-react --server",
+    "sass:build": "node-sass-chokidar src/css/src -o src/css ",
+    "sass:watch": "npm run sass:build && node-sass-chokidar src/css/src -o src/css --watch --recursive --use-polling --polling-interval 1000"
   },
   "peerDependencies": {
     "react": "15.x"
   },
   "devDependencies": {
+    "babel-plugin-transform-remove-imports": "^1.5.2",
     "gh-pages": "^1.0.0",
-    "nwb": "0.18.x",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "mini-css-extract-plugin": "^1.4.1",
+    "ncp": "^2.0.0",
+    "node-sass-chokidar": "^1.5.0",
+    "npm-run-all": "^4.1.5",
+    "nwb": "^0.25.2",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-github-corner": "^0.3.0"
   },
   "author": "Julien Bouquillon <julien@bouquillon.com>",
@@ -43,5 +49,6 @@
     "react-component",
     "analytics",
     "widget"
-  ]
+  ],
+  "dependencies": {}
 }
