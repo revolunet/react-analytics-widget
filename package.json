@@ -12,12 +12,6 @@
   "bugs": {
     "url": "https://github.com/revolunet/react-analytics-widget/issues"
   },
-  "files": [
-    "css",
-    "es",
-    "lib",
-    "umd"
-  ],
   "scripts": {
     "build": "npm-run-all sass:build build:nwb && ncp src/css css",
     "build:nwb": "nwb build-react-component",
